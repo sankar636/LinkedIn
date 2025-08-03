@@ -11,9 +11,9 @@ const registerUser = AsyncHandler(async (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { email, username, password, firstname, lastName } = req.body;
+    const { email, username, password, firstname, lastname } = req.body;
 
-    const fields = { email, username, password, firstname, lastName };
+    const fields = { email, username, password, firstname, lastname };
 
     for (const [key, value] of Object.entries(fields)) {
         if (!value?.trim()) {
@@ -31,7 +31,7 @@ const registerUser = AsyncHandler(async (req, res) => {
 
     const user = await User.create({
         firstname,
-        lastName,
+        lastname,
         email,
         password,
         username: username.toLowerCase()
