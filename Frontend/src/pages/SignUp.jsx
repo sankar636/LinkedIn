@@ -15,13 +15,14 @@ const SignUp = () => {
         email: "",
         password: "",
     });
-
+    const [loading, setLoading] = useState(false)
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
         console.log(serverUrl+`/auth/register`);
         
         try {
@@ -36,7 +37,8 @@ const SignUp = () => {
                     username: "",
                     email: "",
                     password: "",
-                  });                  
+                  });
+                  setLoading(false)                  
                 navigate("/login");
             }
         } catch (error) {
@@ -141,8 +143,8 @@ const SignUp = () => {
                             type="submit"
                             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all text-lg font-medium"
                         >
-                            Sign up
-                        </button>
+                            {loding?"Loading...":"Sign up"}
+                            </button>
                     </form>
 
                     {/* Footer */}

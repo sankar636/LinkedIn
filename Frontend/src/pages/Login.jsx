@@ -10,13 +10,15 @@ const Login = () => {
         emailOrUsername: "",
         password: "",
     });
-
+    const [loding, setLoding] = useState(false)
+    const [error, setError] = useState('')
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoding(true)
         try {
             const res = await axios.post(
                 "http://localhost:4000/api/auth/login",
@@ -40,11 +42,13 @@ const Login = () => {
                     emailOrUsername: "",
                     password: "",
                 })
+                setLoding(false)
                 navigate("/");
             }
         } catch (error) {
             console.error("Login error:", error);
             alert(error.response?.data?.message || "Login failed");
+            setError(error.response)
         }
     };
 
@@ -104,7 +108,7 @@ const Login = () => {
                             type="submit"
                             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all text-lg font-medium"
                         >
-                            Sign in
+                            {loding?"Loading...":"Sign in"}
                         </button>
                     </form>
 
