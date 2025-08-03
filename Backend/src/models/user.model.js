@@ -33,7 +33,6 @@ const userSchema = new Schema({
     },
     profileImage: {
         type: String, // cloudnary url
-        required: true,
     },
     coverImage: {
         type: String // cloudnairy url
