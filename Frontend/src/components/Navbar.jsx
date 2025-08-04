@@ -97,7 +97,9 @@ const Navbar = () => {
                                     <p className="text-xs text-gray-600">{userData?.headline}</p>
                                 </div>
                             </div>
-                            <button className="w-full mt-3 py-2 border rounded-full text-blue-600 font-semibold hover:bg-blue-50">
+                            <button className="w-full mt-3 py-2 border rounded-full text-blue-600 font-semibold hover:bg-blue-50"
+                            onClick={() => navigate('/profile')}
+                            >
                                 View Profile
                             </button>
 
