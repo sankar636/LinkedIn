@@ -17,8 +17,6 @@ const Navbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
-
-    console.log(userData);
     
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -45,7 +43,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="w-full bg-white shadow-sm flex items-center justify-between px-4 py-2 z-50 gap-2 relative">
+        <nav className="w-full absolute top-0 bg-white shadow-sm flex items-center justify-between px-4 py-2 z-50 gap-2">
             <div className="flex items-center gap-3 flex-1 relative">
                 <img src={LinkedIn} alt="LinkedIn" className="h-8 w-8" />
                 <form className="hidden sm:flex flex-1">
