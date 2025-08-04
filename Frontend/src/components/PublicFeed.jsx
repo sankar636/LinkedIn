@@ -27,7 +27,7 @@ const PublicFeed = () => {
     }, [serverUrl, setPosts]);
 
     return (
-        <div className="w-full lg:w-[50%] bg-white shadow-md rounded-lg p-4 mt-6">
+        <div className="w-full bg-white shadow-md rounded-lg p-4 mt-6">
             <h2 className="text-xl font-semibold mb-4">Public Feed</h2>
             {posts.length > 0 ? (
                 posts.map((post) => (
