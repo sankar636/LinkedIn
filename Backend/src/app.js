@@ -6,7 +6,7 @@ const app = express()
 
 app.use(cors({
     // origin: 'http://localhost:5173',
-    origin: 'https://linked-in-iota-snowy.vercel.app/login',
+    origin: 'https://linked-in-iota-snowy.vercel.app',
     credentials: true
 }))
 
