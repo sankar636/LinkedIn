@@ -58,17 +58,13 @@ const Login = () => {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            {/* Header Logo */}
             <div className="p-4">
                 <img src={Logo} alt="LinkedIn Logo" className="h-8 mx-auto sm:mx-0" />
             </div>
-
-            {/* Login Card */}
             <div className="flex items-center justify-center py-10">
                 <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
                     <h2 className="text-3xl font-semibold text-center mb-6">Sign in</h2>
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* Email or Username */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">
                                 Email or Username
@@ -83,8 +79,6 @@ const Login = () => {
                                 required
                             />
                         </div>
-
-                        {/* Password */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Password</label>
                             <div className="relative">
@@ -106,8 +100,6 @@ const Login = () => {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all text-lg font-medium"
@@ -115,8 +107,6 @@ const Login = () => {
                             {loding?"Loading...":"Sign in"}
                         </button>
                     </form>
-
-                    {/* Footer */}
                     <p className="mt-6 text-center text-gray-600 text-sm">
                         New to LinkedIn?{" "}
                         <a href="/signup" className="text-blue-600 hover:underline font-medium">

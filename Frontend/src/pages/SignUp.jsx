@@ -27,7 +27,7 @@ const SignUp = () => {
         
         try {
             const res = await axios.post(serverUrl+`/auth/register`, formData);
-            console.log(res);
+            // console.log(res);
             
             if (res.data.statusCode === 200) {
                 alert("Account created successfully!");
@@ -49,17 +49,13 @@ const SignUp = () => {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            {/* Header Logo */}
             <div className="p-4">
                 <img src={Logo} alt="LinkedIn Logo" className="h-8 mx-auto sm:mx-0" />
             </div>
-
-            {/* Signup Card */}
             <div className="flex items-center justify-center py-2 md:py-10">
                 <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
                     <h2 className="text-3xl font-semibold text-center mb-6">Join LinkedIn</h2>
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {/* First & Last Name */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-gray-700 font-medium mb-1">First Name</label>
@@ -86,8 +82,6 @@ const SignUp = () => {
                                 />
                             </div>
                         </div>
-
-                        {/* Username */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Username</label>
                             <input
@@ -100,8 +94,6 @@ const SignUp = () => {
                                 required
                             />
                         </div>
-
-                        {/* Email */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Email</label>
                             <input
@@ -114,8 +106,6 @@ const SignUp = () => {
                                 required
                             />
                         </div>
-
-                        {/* Password */}
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Password</label>
                             <div className="relative">
@@ -137,8 +127,6 @@ const SignUp = () => {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all text-lg font-medium"
@@ -146,8 +134,6 @@ const SignUp = () => {
                             {loading ? "Loading...":"Sign up"}
                             </button>
                     </form>
-
-                    {/* Footer */}
                     <p className="mt-6 text-center text-gray-600 text-sm">
                         Already have an account?{" "}
                         <a href="/login" className="text-blue-600 hover:underline font-medium">

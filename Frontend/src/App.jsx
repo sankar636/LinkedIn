@@ -10,9 +10,6 @@ import Profile from './pages/Profile.jsx'
 const App = () => {
   let { userData, loading } = useContext(UserDataContext)
   if (loading) return <div>Loading...</div>;
-  console.log(userData);
-
-  // const isAuthenticated = userData?.user !== undefined;
   return (
     <Routes>
       <Route

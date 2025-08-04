@@ -6,7 +6,7 @@ import { FiPlus, FiCamera } from "react-icons/fi";
 import { MdOutlineEdit } from "react-icons/md";
 import EditProfile from '../components/EditProfile';
 import PostPopup from '../components/PostPupUp';
-import PublicFeed from '../components/PublicFeed'; // ✅ Import Public Feed
+import PublicFeed from '../components/PublicFeed'; 
 
 const Home = () => {
   const { userData, setUserData, edit, setEdit } = useContext(UserDataContext)
@@ -18,7 +18,6 @@ const Home = () => {
       {edit && <EditProfile />}
       {openPostPopup && <PostPopup onClose={() => setOpenPostPopup(false)} />}
 
-      {/* Left Sidebar */}
       <div className='w-full lg:w-[25%] min-h-[200px] bg-white shadow-lg rounded-lg p-[10px] relative'>
         <div className='w-full h-[100px] bg-gray-300 rounded overflow-hidden flex items-center justify-center'>
           <img src={userData?.coverImage || " "} alt="" />
@@ -48,9 +47,7 @@ const Home = () => {
         </button>
       </div>
 
-      {/* Middle Section */}
       <div className="w-full lg:w-[50%] min-h-[200px] flex flex-col gap-4">
-        {/* Start a post */}
         <div className="w-full h-[120px] bg-white shadow-lg rounded-lg flex items-center justify-center px-2 gap-2">
           <div className="w-[70px] h-[70px] rounded-full overflow-hidden flex items-center justify-center">
             <img
@@ -66,12 +63,9 @@ const Home = () => {
             Start a post
           </button>
         </div>
-
-        {/* ✅ Public Feed */}
         <PublicFeed />
       </div>
 
-      {/* Right Sidebar */}
       <div className='w-full lg:w-[25%] min-h-[200px] bg-white shadow-lg'></div>
     </div>
   )

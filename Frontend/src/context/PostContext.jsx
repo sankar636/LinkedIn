@@ -16,7 +16,7 @@ const PostProvider = ({ children }) => {
       const response = await axios.get(`${serverUrl}/post/all`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      console.log(response.data);
+    //   console.log(response.data);
       
       setPosts(response.data.data.posts);
     } catch (error) {

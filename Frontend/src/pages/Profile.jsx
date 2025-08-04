@@ -29,8 +29,6 @@ const Profile = () => {
         <div className="bg-gray-100 min-h-screen w-full pt-[90px] flex flex-col items-center">
             <Navbar />
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 my-4">
-
-                {/* Cover & Profile */}
                 <div className="relative">
                     <div className="w-full h-[150px] bg-gray-300 rounded overflow-hidden">
                         <img src={userData.coverImage || ""} alt="Cover" className="w-full h-full object-cover" />
@@ -43,8 +41,6 @@ const Profile = () => {
                         />
                     </div>
                 </div>
-
-                {/* Basic Info */}
                 <div className="mt-16 flex justify-between items-start">
                     <div>
                         <h2 className="text-2xl font-bold">{userData.firstname} {userData.lastname}</h2>
@@ -58,8 +54,6 @@ const Profile = () => {
                         </div>
                     )}
                 </div>
-
-                {/* Edit Button */}
                 <button
                     className="w-full mt-3 py-2 border rounded-full text-blue-600 font-semibold hover:bg-blue-50 flex items-center justify-center gap-2.5 cursor-pointer"
                     onClick={() => {
@@ -69,8 +63,6 @@ const Profile = () => {
                 >
                     Edit Profile <MdOutlineEdit />
                 </button>
-
-                {/* Skills */}
                 {userData.skills?.length > 0 && (
                     <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2">Skills</h3>
@@ -86,8 +78,6 @@ const Profile = () => {
                         </div>
                     </div>
                 )}
-
-                {/* Experience */}
                 {userData.experience?.length > 0 && (
                     <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2 flex items-center">
@@ -102,8 +92,6 @@ const Profile = () => {
                         ))}
                     </div>
                 )}
-
-                {/* Education */}
                 {userData.education?.length > 0 && (
                     <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-2 flex items-center">
@@ -118,8 +106,6 @@ const Profile = () => {
                         ))}
                     </div>
                 )}
-
-                {/* Location & Gender */}
                 <div className="mt-6 grid grid-cols-2 gap-4 text-gray-700">
                     <div>
                         <h4 className="font-semibold">Location</h4>
@@ -130,8 +116,6 @@ const Profile = () => {
                         <p>{userData.gender || "Not specified"}</p>
                     </div>
                 </div>
-
-                {/* Activity / Posts */}
                 <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-2">Activity</h3>
                     {userPosts.length > 0 ? (

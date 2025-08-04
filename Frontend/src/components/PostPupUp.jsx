@@ -18,7 +18,7 @@ const PostPopup = ({ onClose }) => {
         { description: content },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-      console.log(response.data);
+    //   console.log(response.data);
       
       onClose();
     } catch (error) {
@@ -29,15 +29,12 @@ const PostPopup = ({ onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
       <div className="bg-white w-[90%] max-w-[600px] rounded-lg shadow-lg p-4 relative">
-        {/* Close button */}
         <button
           className="absolute top-3 right-3 text-gray-500 hover:text-black"
           onClick={onClose}
         >
           <RxCross2 size={24} />
         </button>
-
-        {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <img
             src={userData?.profilePic || "/EmptyProfile.svg"}
@@ -49,16 +46,12 @@ const PostPopup = ({ onClose }) => {
             <span className="text-sm text-gray-500">Post to Anyone</span>
           </div>
         </div>
-
-        {/* Textarea */}
         <textarea
           placeholder="What do you want to talk about?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="w-full min-h-[150px] border-none outline-none text-lg resize-none"
         />
-
-        {/* Actions */}
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-3 text-gray-500">
             <span>😊</span>

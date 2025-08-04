@@ -13,13 +13,13 @@ const PublicFeed = () => {
         const fetchPosts = async () => {
             try {
                 const response = await axios.get(`${serverUrl}/post/all`);
-                console.log(response.data);                
+                // console.log(response.data);                
                 const sortedPosts = response.data.data.posts.sort(
                     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
                 );
                 setPosts(sortedPosts);
             } catch (error) {
-                console.error("Error fetching posts:", error);
+                // console.error("Error fetching posts:", error);
             }
         };
 
