@@ -95,4 +95,27 @@ const deletePost = AsyncHandler(async (req, res) => {
     );
 });
 
-export { createPost, updatePost, deletePost };
+const getAllPosts = AsyncHandler(async (req, res) => {
+    const posts = await Post.find()
+      .populate("author", "firstname lastname username headLine profileImage")
+      .sort({ createdAt: -1 });
+  
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "All posts fetched successfully", { posts }));
+  });
+  
+  // Get posts of a specific user (Profile page)
+const getUserPosts = AsyncHandler(async (req, res) => {
+    const userId = req.params.userId;
+  
+    const posts = await Post.find({ author: userId })
+      .populate("author", "firstname lastname username headLine profileImage")
+      .sort({ createdAt: -1 });
+  
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "User posts fetched successfully", { posts }));
+  });
+
+export { createPost, updatePost, deletePost, getAllPosts, getUserPosts };
