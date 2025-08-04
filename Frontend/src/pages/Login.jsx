@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Logo from "../assets/Logo1.svg";
 import { UserDataContext } from "../context/UserContext";
+import { AuthDataContext } from "../context/AuthContext";
 
 const Login = () => {
     const navigate = useNavigate();
     const {userData, setUserData} = useContext(UserDataContext)
+    let {serverUrl} = useContext(AuthDataContext)
+    
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         emailOrUsername: "",
@@ -22,8 +25,7 @@ const Login = () => {
         e.preventDefault();
         setLoding(true)
         try {
-            const res = await axios.post(
-                "http://localhost:4000/api/auth/login",
+            const res = await axios.post(serverUrl+'/auth/login',
                 {
                     email: formData.emailOrUsername.includes("@")
                         ? formData.emailOrUsername
