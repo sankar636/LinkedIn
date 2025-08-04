@@ -143,7 +143,7 @@ const SignUp = () => {
                             type="submit"
                             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all text-lg font-medium"
                         >
-                            {loding?"Loading...":"Sign up"}
+                            {loading ? "Loading...":"Sign up"}
                             </button>
                     </form>
 

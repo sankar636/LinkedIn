@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Logo from "../assets/Logo1.svg";
+import { UserDataContext } from "../context/UserContext";
 
 const Login = () => {
     const navigate = useNavigate();
+    const {userData, setUserData} = useContext(UserDataContext)
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         emailOrUsername: "",
@@ -38,17 +40,19 @@ const Login = () => {
                 const data = res.data.data;
                 localStorage.setItem('token', data.token);
                 alert("Login successful!");
+                setUserData(data.user)
                 setFormData({
                     emailOrUsername: "",
                     password: "",
                 })
+                navigate("/");  
                 setLoding(false)
-                navigate("/");
             }
         } catch (error) {
             console.error("Login error:", error);
             alert(error.response?.data?.message || "Login failed");
             setError(error.response)
+            setLoding(false)
         }
     };
 

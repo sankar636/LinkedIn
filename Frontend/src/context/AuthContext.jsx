@@ -20,4 +20,3 @@ const AuthContext = ({ children }) => {
 
 export default AuthContext;
 
-// import.meta.env.VITE_BASE_URL}/auth/me
