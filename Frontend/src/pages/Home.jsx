@@ -6,7 +6,7 @@ import { FiPlus, FiCamera } from "react-icons/fi";
 import { MdOutlineEdit } from "react-icons/md";
 import EditProfile from '../components/EditProfile';
 import PostPopup from '../components/PostPupUp';
-import PublicFeed from '../components/PublicFeed'; 
+import PublicFeed from '../components/PublicFeed';
 
 const Home = () => {
   const { userData, setUserData, edit, setEdit } = useContext(UserDataContext)

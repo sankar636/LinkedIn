@@ -22,7 +22,7 @@ const Profile = () => {
 
     // Filter posts of the current user
     const userPosts = posts.filter(post => post.author?._id === userData._id);
-    console.log(userPosts);
+    // console.log(userPosts);
     
 
     return (
@@ -31,7 +31,7 @@ const Profile = () => {
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 my-4">
                 <div className="relative">
                     <div className="w-full h-[150px] bg-gray-300 rounded overflow-hidden">
-                        <img src={userData.coverImage || ""} alt="Cover" className="w-full h-full object-cover" />
+                        <img src={userData.coverImage || " "} alt="Cover" className="w-full h-full object-cover" />
                     </div>
                     <div className="w-[100px] h-[100px] rounded-full overflow-hidden absolute top-[100px] left-[30px] border-4 border-white shadow-md">
                         <img

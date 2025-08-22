@@ -3,6 +3,7 @@ import { RxCross2 } from "react-icons/rx";
 import { UserDataContext } from "../context/UserContext";
 import axios from "axios";
 import { AuthDataContext } from "../context/AuthContext";
+import { FaImage } from "react-icons/fa6";
 
 const PostPopup = ({ onClose }) => {
   const { userData } = useContext(UserDataContext);
@@ -18,8 +19,8 @@ const PostPopup = ({ onClose }) => {
         { description: content },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-    //   console.log(response.data);
-      
+      //   console.log(response.data);
+
       onClose();
     } catch (error) {
       console.error("Error creating post:", error);
@@ -28,7 +29,7 @@ const PostPopup = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
-      <div className="bg-white w-[90%] max-w-[600px] rounded-lg shadow-lg p-4 relative">
+      <div className="bg-white w-[90%] max-w-[500px] rounded-lg shadow-lg p-4 relative">
         <button
           className="absolute top-3 right-3 text-gray-500 hover:text-black"
           onClick={onClose}
@@ -50,25 +51,21 @@ const PostPopup = ({ onClose }) => {
           placeholder="What do you want to talk about?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full min-h-[150px] border-none outline-none text-lg resize-none"
+          className="w-full min-h-[250px] border-none outline-none text-lg resize-none"
         />
         <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center gap-3 text-gray-500">
-            <span>😊</span>
-            <button className="px-3 py-1 border rounded-full hover:bg-gray-100">
+          <div className="flex items-center gap-3 text-gray-500 border rounded-full px-2 hover:bg-gray-100 cursor-pointer">
+            <FaImage />
+            <button className="py-1 cursor-pointer">
               Add Image
-            </button>
-            <button className="px-3 py-1 border rounded-full hover:bg-gray-100">
-              Add Event
             </button>
           </div>
           <button
             onClick={handlePost}
-            className={`px-5 py-2 rounded-full text-white font-semibold ${
-              content.trim()
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
+            className={`px-5 py-2 rounded-full text-white font-semibold ${content.trim()
+              ? "bg-blue-600 hover:bg-blue-700"
+              : "bg-gray-300 cursor-not-allowed"
+              }`}
             disabled={!content.trim()}
           >
             Post
