@@ -5,7 +5,9 @@ import User from '../models/user.model.js'
 
 const verifyJWT = AsyncHandler(async(req, res, next) => {
     try {
-        const token = req.cookies?.token || req.header('Authorization').replace('Bearer ', '')        
+        const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '')  
+        console.log(token);
+              
         if(!token){
             throw new ApiError(400,"Unauthorized request")
         }
@@ -22,6 +24,8 @@ const verifyJWT = AsyncHandler(async(req, res, next) => {
         
         next()
     } catch (error) {
+        console.log("Error in middleware",error);
+        
         throw new ApiError(401,"Invalid Token")
     }
 })
