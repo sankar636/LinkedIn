@@ -81,9 +81,9 @@ const updatePost = AsyncHandler(async (req, res) => {
 const deletePost = AsyncHandler(async (req, res) => {
     const { postId } = req.params;
 
-    const post = await Post.findOneAndDelete({ 
-        _id: postId, 
-        author: req.user._id 
+    const post = await Post.findOneAndDelete({
+        _id: postId,
+        author: req.user._id
     });
 
     if (!post) {
@@ -97,49 +97,49 @@ const deletePost = AsyncHandler(async (req, res) => {
 
 const getAllPosts = AsyncHandler(async (req, res) => {
     const posts = await Post.find()
-      .populate("author", "firstname lastname username headLine profileImage")
-      .sort({ createdAt: -1 });
-  
+        .populate("author", "firstname lastname username headLine profileImage")
+        .sort({ createdAt: -1 });
+
     return res
-      .status(200)
-      .json(new ApiResponse(200, "All posts fetched successfully", { posts }));
-  });
-  
-  // Get posts of a specific user (Profile page)
+        .status(200)
+        .json(new ApiResponse(200, "All posts fetched successfully", { posts }));
+});
+
+// Get posts of a specific user (Profile page)
 const getUserPosts = AsyncHandler(async (req, res) => {
     const userId = req.params.userId;
-  
+
     const posts = await Post.find({ author: userId })
-      .populate("author", "firstname lastname username headLine profileImage")
-      .sort({ createdAt: -1 });
-  
+        .populate("author", "firstname lastname username headLine profileImage")
+        .sort({ createdAt: -1 });
+
     return res
-      .status(200)
-      .json(new ApiResponse(200, "User posts fetched successfully", { posts }));
-  });
+        .status(200)
+        .json(new ApiResponse(200, "User posts fetched successfully", { posts }));
+});
 
 const likePosts = AsyncHandler(async (req, res) => {
     const { id } = req.params;
     // console.log("postId",id);    
     const userId = req.user._id;
     const post = await Post.findById(id);
-    if(!post){
+    if (!post) {
         throw new ApiError(400, "Post not Found");
     }
 
-    let updatedPost ;
-    if(post.likes.includes(userId)){
+    let updatedPost;
+    if (post.likes.includes(userId)) {
         // Unlike post
-        console.log("Dislike");        
+        console.log("Dislike");
         // post.likes = post.likes.filter((id) => id.toString() !== userId.toString())
         updatedPost = await Post.findByIdAndUpdate(
             id,
             { $pull: { likes: userId } },
             { new: true }
         );
-    }else{
+    } else {
         //Like
-        console.log("Like");        
+        console.log("Like");
         // post.likes.push(userId)
         updatedPost = await Post.findByIdAndUpdate(
             id,
@@ -156,7 +156,38 @@ const likePosts = AsyncHandler(async (req, res) => {
 })
 
 const commentPosts = AsyncHandler(async (req, res) => {
-    // const { id } = req.params
+
+    const { id } = req.params
+    const { content } = req.body;
+    const post = await Post.findById(id);
+    if (!post) {
+        throw new ApiError(400, "Post not Found");
+    }
+
+    if (!content || !content.trim()) {
+        throw new ApiError(400, "comment cannot be empty");
+    }
+
+    const updatedPost = await Post.findByIdAndUpdate(
+        id,
+        { $push: { comments: { content, user: req.user._id } } },
+        { new: true }
+    ).populate("comments.user", "firstname lastname profileImage");
+
+    if (!updatedPost) {
+        throw new ApiError(404, "Post not found");
+    }
+
+    await post.save()
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            "Comment added successfully",
+            { updatedPost }
+        )
+    );
+
 })
 
 export { createPost, updatePost, deletePost, getAllPosts, getUserPosts, likePosts, commentPosts };

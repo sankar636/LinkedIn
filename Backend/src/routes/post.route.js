@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import { Router } from "express";
 import verifyJWT from "../middleware/auth.middleware.js";
-import { createPost, updatePost, deletePost, getAllPosts, getUserPosts,likePosts } from "../controller/post.controller.js";
+import { createPost, updatePost, deletePost, getAllPosts, getUserPosts, likePosts, commentPosts } from "../controller/post.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 
 const router = Router();
@@ -46,6 +46,7 @@ router.get("/all", getAllPosts);
 router.get("/user/:userId", getUserPosts);
 
 router.post("/:id/like",verifyJWT, likePosts)
+router.post("/:id/comment",verifyJWT, commentPosts)
 
 
 export default router
