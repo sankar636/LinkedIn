@@ -155,39 +155,6 @@ const likePosts = AsyncHandler(async (req, res) => {
         .json(new ApiResponse(200, "Post like status updated", { likes: post.likes.length }));
 })
 
-const commentPosts = AsyncHandler(async (req, res) => {
 
-    const { id } = req.params
-    const { content } = req.body;
-    const post = await Post.findById(id);
-    if (!post) {
-        throw new ApiError(400, "Post not Found");
-    }
 
-    if (!content || !content.trim()) {
-        throw new ApiError(400, "comment cannot be empty");
-    }
-
-    const updatedPost = await Post.findByIdAndUpdate(
-        id,
-        { $push: { comments: { content, user: req.user._id } } },
-        { new: true }
-    ).populate("comments.user", "firstname lastname profileImage");
-
-    if (!updatedPost) {
-        throw new ApiError(404, "Post not found");
-    }
-
-    await post.save()
-
-    return res.status(200).json(
-        new ApiResponse(
-            200,
-            "Comment added successfully",
-            { updatedPost }
-        )
-    );
-
-})
-
-export { createPost, updatePost, deletePost, getAllPosts, getUserPosts, likePosts, commentPosts };
+export { createPost, updatePost, deletePost, getAllPosts, getUserPosts, likePosts};

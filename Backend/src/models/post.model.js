@@ -20,15 +20,10 @@ const postSchema = new Schema({
         ref: "User"
     }],
     comments: [{
-        content: {
-            type: String,
-            trim: true
-        },
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        }
+        type:mongoose.Schema.Types.ObjectId,
+        ref: "Comment"
     }],
+    commentCount: { type: Number, default: 0 },
     hashtags: [{
         type: String,
         trim: true

@@ -37,7 +37,6 @@ const Login = () => {
                 },
                 { withCredentials: true }
             );
-            console.log(res.data);
             if (res.data.statusCode === 200) {
                 const data = res.data.data;
                 localStorage.setItem('token', data.token);
