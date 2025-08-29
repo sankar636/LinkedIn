@@ -12,8 +12,14 @@ const UserContext = ({ children }) => {
 
     const getCurrentUser = async () => {
         try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                setUserData(null);
+                setLoading(false);
+                return;
+            }
             const result = await axios.get(`${serverUrl}/user/currentuser`, {
-                withCredentials: true,
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             if (result.data.statusCode === 200) {
