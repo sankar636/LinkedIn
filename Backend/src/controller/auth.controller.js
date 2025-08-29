@@ -4,6 +4,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 import { validationResult } from "express-validator";
 
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // true in production, false in dev
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 'none' for cross-site, 'lax' for same-site
+};
 
 const registerUser = AsyncHandler(async (req, res) => {
 
@@ -77,10 +82,11 @@ const loginUser = AsyncHandler(async (req, res) => {
     }
 
     const token = user.generateToken();
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: false
-    });
+    // res.cookie("token", token, {
+    //     httpOnly: true,
+    //     secure: false
+    // });
+    res.cookie("token", token, cookieOptions);
 
     return res.status(200).json(
         new ApiResponse(200, "User logged in successfully", { user: user, token })
@@ -88,10 +94,10 @@ const loginUser = AsyncHandler(async (req, res) => {
 });
 
 const logoutUser = AsyncHandler(async (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-    });
-
+    // res.clearCookie("token", {
+    //     httpOnly: true,
+    // });
+    res.clearCookie("token", cookieOptions);
     return res.status(200).json(
         new ApiResponse(200, "User Logged out successfully", { data: null })
     );
