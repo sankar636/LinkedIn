@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { PostContext } from "../context/PostContext";
 import { BiLike, BiSolidLike, BiRepost } from "react-icons/bi";
 import { FaRegComment } from "react-icons/fa";
@@ -8,6 +8,7 @@ import axios from "axios";
 import EmptyProfile from "/EmptyProfile.svg";
 import { UserDataContext } from "../context/UserContext";
 import CommentSection from "./CommentSection";
+import { Link } from "react-router-dom";
 
 const PublicFeed = () => {
     const { posts, setPosts } = useContext(PostContext);
@@ -15,6 +16,9 @@ const PublicFeed = () => {
     const { userData } = useContext(UserDataContext);
 
     const [openComments, setOpenComments] = useState(null);
+
+    const [openMore, setOpenMore] = useState(false);
+    const menuRef = useRef();
 
     // console.log("Posts", posts);
 
@@ -75,6 +79,18 @@ const PublicFeed = () => {
         if (interval >= 1) return `${interval} minute${interval > 1 ? "s" : ""} ago`;
         return "a few seconds ago";
     }
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setOpenMore(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [setOpenMore]);
 
     return (
         <div className="w-full shadow-md rounded-lg md:p-4 mt-6">
@@ -86,23 +102,38 @@ const PublicFeed = () => {
                         className="border-b border-gray-200 pb-4 mb-6 bg-white rounded-lg shadow-sm"
                     >
                         {/* Author Info */}
-                        <div className="flex items-center gap-3 p-4">
-                            <img
-                                src={post.author?.profilePic || EmptyProfile}
-                                alt="Author"
-                                className="w-10 h-10 rounded-full object-cover"
-                            />
-                            <div>
-                                <p className="font-semibold text-gray-800">
-                                    {post.author?.firstname} {post.author?.lastname}
-                                </p>
-                                <span className="text-gray-500 text-xs">
-                                    {timeAgo(post.createdAt)}
+                        <div className="flex items-start justify-between ">
+                            <Link to={`/profile/${post.author.username}`} className="flex items-center gap-3 p-4 cursor-pointer">
+                                <img
+                                    src={post.author?.profilePic || EmptyProfile}
+                                    alt="Author"
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <div>
+                                    <p className="font-semibold text-gray-800">
+                                        {post.author?.firstname} {post.author?.lastname}
+                                    </p>
+                                    <span className="text-gray-500 text-xs">
+                                        {timeAgo(post.createdAt)}
+                                    </span>
+                                </div>
+                            </Link>
+                            <div className="px-4 font-bold text-2xl text-gray-400 h-full" ref={menuRef}>
+                                <span className="cursor-pointer relative"
+                                    onClick={() => setOpenMore(openMore === post._id ? null : post._id)}
+                                >...
+                                    {openMore === post._id &&
+                                        (<div className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col gap-2 text-sm">
+                                            {/* Two Way connection + messaging */}
+                                            <button className="cursor-pointer">Connect</button>
+                                            {/* One way connection(No messaging access) */}
+                                            <button className="cursor-pointer">Follow</button>
+                                        </div>)
+                                    }
                                 </span>
                             </div>
                         </div>
 
-                        {/* Post Content */}
                         <div className="px-4">
                             <p className="text-gray-800 text-sm">{post.description}</p>
                             {post?.hashtags && post.hashtags.length > 0 && (

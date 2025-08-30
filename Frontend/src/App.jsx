@@ -6,6 +6,7 @@ import Home from './pages/Home.jsx'
 import { UserDataContext } from './context/UserContext.jsx'
 import ProtectedRoute from './pages/ProtectRouter.jsx'
 import Profile from './pages/Profile.jsx'
+import UserProfilePage from './pages/UserProfilePage.jsx'
 
 const App = () => {
   let { userData, loading } = useContext(UserDataContext)
@@ -24,6 +25,13 @@ const App = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route path='/profile/:username'
+        element={
+          <ProtectedRoute>
+            <UserProfilePage />
           </ProtectedRoute>
         }
       />

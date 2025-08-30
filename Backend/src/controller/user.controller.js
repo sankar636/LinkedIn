@@ -2,6 +2,7 @@ import { AsyncHandler } from "../utils/AsyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../models/user.model.js";
+import Post from "../models/post.model.js";
 
 const getCurrentUser = AsyncHandler(async (req, res) => {
   if (!req.user) {
@@ -50,7 +51,28 @@ const updateProfile = AsyncHandler(async (req, res) => {
   );
 });
 
+const getUserAccountProfile = AsyncHandler(async (req,res) => {
+  const { username }  = req.params;
+  if(!username?.trim()){
+    throw new ApiError(404, "username is not defined");
+  }
+
+  const user = await User.findOne({ username }).select("-password");
+
+  const posts = await Post.find({ author: user._id }).sort({ createdAt: -1 })
+  
+  if(!user){
+    throw new ApiError(404, "user not Found");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, "user fatched successfully", { user, posts })
+  );
+
+})
+
 export {
     getCurrentUser,
-    updateProfile
+    updateProfile,
+    getUserAccountProfile
 }

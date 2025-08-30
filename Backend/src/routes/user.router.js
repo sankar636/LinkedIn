@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import { Router } from "express";
 import verifyJWT from "../middleware/auth.middleware.js";
-import { getCurrentUser, updateProfile } from "../controller/user.controller.js";
+import { getCurrentUser, updateProfile, getUserAccountProfile } from "../controller/user.controller.js";
 
 
 const router = Router();
@@ -16,5 +16,9 @@ router.route('/updateprofile').put(
     updateProfile
 );
 
+router.route('/profile/:username').get(
+    verifyJWT, 
+    getUserAccountProfile
+);
 
 export default router

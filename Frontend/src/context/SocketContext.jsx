@@ -12,7 +12,7 @@ const SocketProvider = ({ children }) => {
     const { serverUrl } = useContext(AuthDataContext);
     useEffect(() => {
         if(!serverUrl) return;
-        const socket = io("http://localhost:4000", {
+        const socket = io(`${serverUrl}` /*"http://localhost:4000"*/, {
             withCredentials:  true,
             transports: ['websocket', 'polling'],
             path: '/socket.io'
