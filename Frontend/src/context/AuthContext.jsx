@@ -4,8 +4,8 @@ import axios from "axios";
 export const AuthDataContext = createContext();
 
 const AuthContext = ({ children }) => {
-    const serverUrl = 'http://localhost:4000/api'
-    // const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
+    // const serverUrl = 'http://localhost:4000/api'
+    const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
 
     let value = {
         serverUrl
