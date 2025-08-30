@@ -10,7 +10,7 @@ const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null)
     useEffect(() => {
         const newSocket = io(
-            "https://linkedin-q5gk.onrender.com/api" ,
+            "https://linkedin-q5gk.onrender.com" ,
             // "http://localhost:4000", 
         {
             withCredentials:  true,
