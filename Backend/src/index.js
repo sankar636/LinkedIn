@@ -16,6 +16,8 @@ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
+import './server.js'
+
 connectDB().then(() => {
     app.listen(process.env.PORT || 4000, () => {
         console.log(`MongoDB connected successfully on ${process.env.PORT || 4000}`);

@@ -39,6 +39,8 @@ const Navbar = () => {
             navigate("/login");
         } catch (error) {
             console.error("Logout failed:", error);
+        } finally{
+            localStorage.removeItem("token");
         }
     };
 
