@@ -101,9 +101,12 @@ const PublicFeed = () => {
                         key={post._id}
                         className="border-b border-gray-200 pb-4 mb-6 bg-white rounded-lg shadow-sm"
                     >
-                        {/* Author Info */}
                         <div className="flex items-start justify-between ">
-                            <Link to={`/profile/${post.author.username}`} className="flex items-center gap-3 p-4 cursor-pointer">
+                            <Link to={
+                                userData?._id === post.author._id
+                                    ? "/profile"
+                                    : `/profile/${post.author.username}`
+                            } className="flex items-center gap-3 p-4 cursor-pointer">
                                 <img
                                     src={post.author?.profilePic || EmptyProfile}
                                     alt="Author"
@@ -119,18 +122,24 @@ const PublicFeed = () => {
                                 </div>
                             </Link>
                             <div className="px-4 font-bold text-2xl text-gray-400 h-full" ref={menuRef}>
-                                <span className="cursor-pointer relative"
-                                    onClick={() => setOpenMore(openMore === post._id ? null : post._id)}
-                                >...
-                                    {openMore === post._id &&
-                                        (<div className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col gap-2 text-sm">
-                                            {/* Two Way connection + messaging */}
-                                            <button className="cursor-pointer">Connect</button>
-                                            {/* One way connection(No messaging access) */}
-                                            <button className="cursor-pointer">Follow</button>
-                                        </div>)
-                                    }
-                                </span>
+                                {userData?._id !== post.author._id &&
+                                    <span className="cursor-pointer relative"
+                                        onClick={() => setOpenMore(openMore === post._id ? null : post._id)}
+                                    >...
+                                        {openMore === post._id &&
+                                            (<div className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col gap-2 text-sm">
+                                                {/* Two Way connection + messaging */}
+                                                <button className="cursor-pointer"
+
+                                                >Connect</button>
+                                                {/* One way connection(No messaging access) */}
+                                                <button className="cursor-pointer"
+
+                                                >Follow</button>
+                                            </div>)
+                                        }
+                                    </span>
+                                }
                             </div>
                         </div>
 
@@ -147,7 +156,6 @@ const PublicFeed = () => {
                             )}
                         </div>
 
-                        {/* Post Image */}
                         {post?.image && (
                             <div className="mt-3">
                                 <img
@@ -158,13 +166,11 @@ const PublicFeed = () => {
                             </div>
                         )}
 
-                        {/* Likes + Comments Count */}
                         <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-600">
                             <span>{post.likes.length} Likes</span>
                             <span>{post.commentCount || post.comments?.length || 0} Comments</span>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="border-t-2 mx-4 flex items-center justify-between text-gray-600 text-sm">
                             <button
                                 onClick={() => handleLike(post._id)}
@@ -199,7 +205,6 @@ const PublicFeed = () => {
                             </button>
                         </div>
 
-                        {/* Comment Section */}
                         {openComments === post._id && (
                             <CommentSection
                                 post={post}

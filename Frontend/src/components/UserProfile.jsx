@@ -1,55 +1,30 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { MdOutlineEdit } from "react-icons/md";
 import { FiBriefcase, FiBookOpen } from "react-icons/fi";
 import EmptyProfile from '/EmptyProfile.svg';
 import { UserDataContext } from '../context/UserContext.jsx';
-import { AuthDataContext } from '../context/AuthContext';
 
 const UserProfile = ({ username }) => {
-    const [profileData, setProfileData] = useState(null);
-    const [userPosts, setUserPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const {
+        userData: loggedInUser,
+        profileData,
+        userPosts,
+        loadingProfile,
+        error,
+        setEdit,
+        getUserProfile
+    } = useContext(UserDataContext);
 
-    const { serverUrl } = useContext(AuthDataContext)
-    const { userData: loggedInUser, setEdit } = useContext(UserDataContext);
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!username) return;
-
-        const fetchProfile = async () => {
-            setLoading(true);
-            try {
-                const response =await axios.get(`${serverUrl}/user/profile/${username}`,
-                    {
-                        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-                    }
-                )
-                
-                const data = response.data.data.user;
-                const userposts = response.data.data.posts;
-                // console.log("User Posts", userposts);
-                
-                setProfileData(data);
-                setUserPosts(userposts);
-                setError("");
-            } catch (err) {
-                console.log(err);                
-                setError(err.response?.data.data?.message || "Failed to fetch profile data.");
-                setProfileData(null);
-                setUserPosts([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProfile();
+        if (username) {
+            getUserProfile(username);
+        }
     }, [username]);
 
-    if (loading) return <p className="text-center p-10">Loading profile...</p>;
+    if (loadingProfile) return <p className="text-center p-10">Loading profile...</p>;
     if (error) return <p className="text-center text-red-500 p-10">{error}</p>;
     if (!profileData) return <p className="text-center p-10">No profile found.</p>;
 
@@ -77,12 +52,11 @@ const UserProfile = ({ username }) => {
                     <p className="text-gray-400">{profileData.location || "Location not specified"}</p>
                 </div>
                 {isOwnProfile && (
-                     <button
+                    <button
                         className="py-2 px-4 border rounded-full text-blue-600 font-semibold hover:bg-blue-50 flex items-center justify-center gap-2 cursor-pointer"
-
                         onClick={() => {
-                            setEdit(true)
-                            navigate('/')
+                            setEdit(true);
+                            navigate('/');
                         }}
                     >
                         Edit Profile <MdOutlineEdit />
@@ -118,7 +92,7 @@ const UserProfile = ({ username }) => {
                 </div>
             )}
 
-           {profileData.education?.length > 0 && (
+            {profileData.education?.length > 0 && (
                 <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-2 flex items-center">
                         <FiBookOpen className="w-5 h-5 mr-2" /> Education
@@ -133,7 +107,7 @@ const UserProfile = ({ username }) => {
                 </div>
             )}
 
-             <div className="mt-6">
+            <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-2">Activity</h3>
                 {userPosts?.length > 0 ? (
                     userPosts.map((post) => (
