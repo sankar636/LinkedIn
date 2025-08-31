@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 const PublicFeed = () => {
     const { posts, setPosts } = useContext(PostContext);
     const { serverUrl } = useContext(AuthDataContext);
-    const { userData } = useContext(UserDataContext);
+    const { userData, followUser, following } = useContext(UserDataContext);
 
     const [openComments, setOpenComments] = useState(null);
 
@@ -79,19 +79,17 @@ const PublicFeed = () => {
         if (interval >= 1) return `${interval} minute${interval > 1 ? "s" : ""} ago`;
         return "a few seconds ago";
     }
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setOpenMore(null);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [setOpenMore]);
-
+    const handleFollow = async (userId) => {
+        console.log(userId);
+        try {
+            await followUser(userId); 
+        } catch (err) {
+            console.error("Error following user:", err);
+        } finally {
+            setOpenMore(null); 
+        }
+    };
+  
     return (
         <div className="w-full shadow-md rounded-lg md:p-4 mt-6">
             <h2 className="text-xl font-semibold mb-4">Public Feed</h2>
@@ -121,26 +119,36 @@ const PublicFeed = () => {
                                     </span>
                                 </div>
                             </Link>
-                            <div className="px-4 font-bold text-2xl text-gray-400 h-full" ref={menuRef}>
-                                {userData?._id !== post.author._id &&
-                                    <span className="cursor-pointer relative"
-                                        onClick={() => setOpenMore(openMore === post._id ? null : post._id)}
-                                    >...
-                                        {openMore === post._id &&
-                                            (<div className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col gap-2 text-sm">
-                                                {/* Two Way connection + messaging */}
-                                                <button className="cursor-pointer"
-
-                                                >Connect</button>
-                                                {/* One way connection(No messaging access) */}
-                                                <button className="cursor-pointer"
-
-                                                >Follow</button>
-                                            </div>)
+                            <div className="px-4 font-bold text-2xl text-gray-400 h-full">
+                                {userData?._id !== post.author._id && (
+                                    <span
+                                        className="cursor-pointer relative"
+                                        onClick={() =>
+                                            setOpenMore(openMore === post._id ? null : post._id)
                                         }
+                                    >
+                                        ...
+                                        {openMore === post._id && (
+                                            <div className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col gap-2 text-sm"
+                                                onMouseLeave={() => setOpenMore((prev) => !prev)}
+                                            >
+                                                <button className="cursor-pointer">Connect</button>
+                                                <button
+                                                    className="cursor-pointer"
+                                                    onClick={() => handleFollow(post.author._id)}
+                                                    // onClick={() => alert("button clicked")}
+                                                    disabled={following?.some(f => f._id === post.author._id)}
+                                                >
+                                                    {following?.some(f => f._id === post.author._id)
+                                                        ? "Following"
+                                                        : "Follow"}
+                                                </button>
+                                            </div>
+                                        )}
                                     </span>
-                                }
+                                )}
                             </div>
+
                         </div>
 
                         <div className="px-4">

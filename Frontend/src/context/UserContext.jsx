@@ -9,14 +9,16 @@ const UserContext = ({ children }) => {
     const { serverUrl } = useContext(AuthDataContext);
     const [edit, setEdit] = useState(false);
     const [userData, setUserData] = useState(null);
-    const [profileData, setProfileData] = useState(null); 
-    const [userPosts, setUserPosts] = useState([]);   
+    const [profileData, setProfileData] = useState(null);
+    const [userPosts, setUserPosts] = useState([]);
     const [error, setError] = useState("");
     const [loadingProfile, setLoadingProfile] = useState(true);
+    const [followers, setFollowers] = useState(null);
+    const [following, setFollowing] = useState(null);
 
+    const token = localStorage.getItem("token");
     const getCurrentUser = async () => {
         try {
-            const token = localStorage.getItem("token");
             if (!token) {
                 setUserData(null);
                 setLoading(false);
@@ -69,9 +71,51 @@ const UserContext = ({ children }) => {
         }
     };
 
+    const followUser = async (followedUserId) => {
+        try {
+            const response = await axios.post(
+                `${serverUrl}/user/${followedUserId}/follow`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            console.log("follow User Respose", response.data.data);
+            const data = response.data.data;
+            if (response.status === 200) {
+                await getFollower()
+            }
+            if (profileData && profileData._id === followedUserId) { // update profile
+                await getUserProfile(profileData.username);
+            }
+
+        } catch (err) {
+            console.error("Error following user:", err);
+            setError("Failed to follow user. Please try again.");
+        }
+    }
+
+    const getFollower = async () => {
+        try {
+            const response = await axios.get(`${serverUrl}/user/followUser`,
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            )
+            console.log("Follower", response.data.data);
+            const data = response.data.data;
+            setFollowers(data.followers);
+            setFollowing(data.following);
+
+        } catch (error) {
+
+        }
+    }
+
     useEffect(() => {
         getCurrentUser();
+        getFollower();
     }, []);
+
+
 
     return (
         <UserDataContext.Provider value={{
@@ -85,7 +129,11 @@ const UserContext = ({ children }) => {
             updateUserProfile,
             profileData,
             userPosts,
-            getUserProfile
+            getUserProfile,
+            followers,
+            following,
+            getFollower,
+            followUser
         }}>
             {children}
         </UserDataContext.Provider>
