@@ -71,12 +71,18 @@ const userSchema = new Schema({
             description: { type: String }
         }
     ],
-    connections: [
+    followers: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "User"
         }
     ],
+    following: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ]
 },
     { timestamps: true }
 )
