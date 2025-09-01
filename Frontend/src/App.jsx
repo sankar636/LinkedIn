@@ -7,6 +7,8 @@ import { UserDataContext } from './context/UserContext.jsx'
 import ProtectedRoute from './pages/ProtectRouter.jsx'
 import Profile from './pages/Profile.jsx'
 import UserProfilePage from './pages/UserProfilePage.jsx'
+import MyNetwork from './pages/MyNetwork.jsx'
+import Notification from './pages/Notification.jsx'
 
 const App = () => {
   let { userData, loading } = useContext(UserDataContext)
@@ -32,6 +34,20 @@ const App = () => {
         element={
           <ProtectedRoute>
             <UserProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path='/network'
+        element={
+          <ProtectedRoute>
+            <MyNetwork />
+          </ProtectedRoute>
+        }
+      />
+      <Route path='/notification'
+        element={
+          <ProtectedRoute>
+            <Notification />
           </ProtectedRoute>
         }
       />

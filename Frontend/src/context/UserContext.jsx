@@ -80,9 +80,7 @@ const UserContext = ({ children }) => {
             );
             console.log("follow User Respose", response.data.data);
             const data = response.data.data;
-            if (response.status === 200) {
-                await getFollower()
-            }
+            
             if (profileData && profileData._id === followedUserId) { // update profile
                 await getUserProfile(profileData.username);
             }
@@ -112,7 +110,6 @@ const UserContext = ({ children }) => {
 
     useEffect(() => {
         getCurrentUser();
-        getFollower();
     }, []);
 
 
