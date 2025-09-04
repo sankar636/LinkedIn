@@ -56,10 +56,7 @@ const NetworkSidebar = ({ activeTab, setActiveTab }) => {
                             isActive={activeTab === item.key}
                             onClick={() => {
                                 setActiveTab(item.key);
-                                // Close sidebar on mobile after selection
-                                // if (window.innerWidth < 768) {
-                                //     setIsSideBarOpen(false);
-                                // }
+                                
                             }}
                         />
                     ))}

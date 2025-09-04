@@ -2,38 +2,22 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import EmptyProfile from "/EmptyProfile.svg";
 import { MdDelete } from "react-icons/md";
+import { usePosts } from "../context/PostContext";
 
-const CommentSection = ({ post, serverUrl, token, userData, setPosts }) => {
+const CommentSection = ({ post, userData }) => {
   const [commentInputs, setCommentInputs] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { addComment, deleteComment, fetchComments } = usePosts()
 
   const handleAddComment = async () => {
     if (!commentInputs.trim()) return;
 
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        `${serverUrl}/comments`,
-        { postId: post._id, content: commentInputs },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      // console.log(response.data.data);
-
-      const newComment = response.data.data.comment;
-      setPosts((prev) =>
-        prev.map((p) =>
-          p._id === post._id
-            ? {
-              ...p,
-              comments: [...p.comments, newComment],
-              commentCount: p.commentCount + 1
-            }
-            : p
-        )
-      );
+      await addComment(post._id, commentInputs);
       setCommentInputs("");
     } catch (err) {
-      console.error("Error adding comment:", err.response?.data?.message || err.message);
+      console.error("Error adding comment:", err.message);
     } finally {
       setIsLoading(false);
     }
@@ -41,51 +25,20 @@ const CommentSection = ({ post, serverUrl, token, userData, setPosts }) => {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axios.delete(
-        `${serverUrl}/comments/${commentId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await deleteComment(commentId, post._id)
 
-      setPosts((prev) =>
-        prev.map((p) =>
-          p._id === post._id
-            ? {
-              ...p,
-              comments: p.comments.filter((c) => c._id !== commentId),
-              commentCount: p.commentCount - 1
-            }
-            : p
-        )
-      );
     } catch (err) {
       console.error("Error deleting comment:", err.response?.data?.message || err.message);
     }
   };
 
-  const getAllComment = async () => {
-    try {
-      const res = await axios.get(
-        `${serverUrl}/comments/post/${post._id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const comments = res.data.data.comments || [];
-
-      setPosts((prev) =>
-        prev.map((p) =>
-          p._id === post._id ? { ...p, comments } : p
-        )
-      );
-    } catch (err) {
-      console.error(
-        "Error In Getting All Comments",
-        err.response?.data?.message || err.message
-      );
-    }
-  };
+  
   useEffect(() => {
-    getAllComment()
-  }, [])
+    // if(!post.comments || !post.comments.length === 0){
+    //   fetchComments(post._id)
+    // }
+    fetchComments(post._id)
+  }, [post._id])
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

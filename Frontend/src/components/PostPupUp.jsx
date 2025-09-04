@@ -1,26 +1,19 @@
 import React, { useContext, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
-import { UserDataContext } from "../context/UserContext";
-import axios from "axios";
-import { AuthDataContext } from "../context/AuthContext";
+import { useUser } from "../context/UserContext";
 import { FaImage } from "react-icons/fa6";
+import { usePosts } from "../context/PostContext"; // Import usePosts
 
 const PostPopup = ({ onClose }) => {
-  const { userData } = useContext(UserDataContext);
-  const { serverUrl } = useContext(AuthDataContext);
+  const { userData } = useUser();
   const [content, setContent] = useState("");
+  const { createPost } = usePosts(); // Use createPost from context
 
   const handlePost = async () => {
     if (!content.trim()) return;
 
     try {
-      const response = await axios.post(
-        `${serverUrl}/post/create`,
-        { description: content },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      //   console.log(response.data);
-
+      await createPost(content); // Use context method
       onClose();
     } catch (error) {
       console.error("Error creating post:", error);

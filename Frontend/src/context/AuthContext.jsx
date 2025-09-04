@@ -1,11 +1,18 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 
 export const AuthDataContext = createContext();
+export const useAuth = () => {
+  const context = useContext(AuthDataContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthContext');
+  }
+  return context;
+};
 
-const AuthContext = ({ children }) => {
-    // const serverUrl = 'http://localhost:4000/api'
-    const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
+const AuthProvider = ({ children }) => {
+    const serverUrl = 'http://localhost:4000/api'
+    // const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
 
     let value = {
         serverUrl
@@ -18,5 +25,5 @@ const AuthContext = ({ children }) => {
     );
 };
 
-export default AuthContext;
+export default AuthProvider;
 

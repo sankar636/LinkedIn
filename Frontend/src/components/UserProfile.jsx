@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MdOutlineEdit } from "react-icons/md";
 import { FiBriefcase, FiBookOpen } from "react-icons/fi";
 import EmptyProfile from '/EmptyProfile.svg';
-import { UserDataContext } from '../context/UserContext.jsx';
+import { useUser } from '../context/UserContext.jsx';
 
 const UserProfile = ({ username }) => {
     const {
@@ -14,7 +14,7 @@ const UserProfile = ({ username }) => {
         error,
         setEdit,
         getUserProfile
-    } = useContext(UserDataContext);
+    } = useUser();
 
     const navigate = useNavigate();
 

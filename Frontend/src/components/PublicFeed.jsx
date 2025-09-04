@@ -1,234 +1,92 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { PostContext } from "../context/PostContext";
-import { BiLike, BiSolidLike, BiRepost } from "react-icons/bi";
-import { FaRegComment } from "react-icons/fa";
-import { LuSend } from "react-icons/lu";
-import { AuthDataContext } from "../context/AuthContext";
-import axios from "axios";
-import EmptyProfile from "/EmptyProfile.svg";
-import { UserDataContext } from "../context/UserContext";
-import CommentSection from "./CommentSection";
-import { Link } from "react-router-dom";
+import React, { useCallback, useMemo, useRef, useEffect, useState } from "react";
 
+import { usePosts } from "../context/PostContext";
+import { useAuth } from "../context/AuthContext";
+import { useUser } from "../context/UserContext";
+import PostItem from "./PostItem";
 const PublicFeed = () => {
-    const { posts, setPosts } = useContext(PostContext);
-    const { serverUrl } = useContext(AuthDataContext);
-    const { userData, followUser, following } = useContext(UserDataContext);
+    const { posts, loading, error, likePost, fetchPosts } = usePosts();
+    const { userData, followUser } = useUser();    
+    const [openComments, setOpenComments] = React.useState(null);
+    const [openMore, setOpenMore] = React.useState(null);
 
-    const [openComments, setOpenComments] = useState(null);
-
-    const [openMore, setOpenMore] = useState(false);
-    const menuRef = useRef();
-
-    // console.log("Posts", posts);
-
-    // Fetch posts
+    // Fetch posts on mount
     useEffect(() => {
-        const fetchPosts = async () => {
-            try {
-                const response = await axios.get(`${serverUrl}/post/all`);
-                const sortedPosts = response.data.data.posts.sort(
-                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                );
-                setPosts(sortedPosts);
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            }
-        };
-
         fetchPosts();
-    }, [serverUrl, setPosts]);
+    }, [fetchPosts]);
 
-    const handleLike = async (postId) => {
+    // const sortedPosts = useMemo(() => 
+    //     [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+    //     [posts]
+    // );
+
+    // Memoized event handlers
+    const handleLike = useCallback(async (postId) => {
         try {
-            const token = localStorage.getItem("token");
-            await axios.post(
-                `${serverUrl}/post/${postId}/like`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            setPosts((prev) =>
-                prev.map((post) =>
-                    post._id === postId
-                        ? {
-                            ...post,
-                            likes: post.likes.includes(userData._id)
-                                ? post.likes.filter((id) => id !== userData._id)
-                                : [...post.likes, userData._id],
-                        }
-                        : post
-                )
-            );
+            await likePost(postId);
         } catch (err) {
             console.error("Error liking post:", err);
         }
-    };
+    }, [likePost]);
 
-    function timeAgo(date) {
-        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-        let interval = Math.floor(seconds / 31536000);
-        if (interval >= 1) return `${interval} year${interval > 1 ? "s" : ""} ago`;
-        interval = Math.floor(seconds / 2592000);
-        if (interval >= 1) return `${interval} month${interval > 1 ? "s" : ""} ago`;
-        interval = Math.floor(seconds / 86400);
-        if (interval >= 1) return `${interval} day${interval > 1 ? "s" : ""} ago`;
-        interval = Math.floor(seconds / 3600);
-        if (interval >= 1) return `${interval} hour${interval > 1 ? "s" : ""} ago`;
-        interval = Math.floor(seconds / 60);
-        if (interval >= 1) return `${interval} minute${interval > 1 ? "s" : ""} ago`;
-        return "a few seconds ago";
-    }
-    const handleFollow = async (userId) => {
-        console.log(userId);
+    const handleToggleComments = useCallback((postId) => {
+        setOpenComments(prev => prev === postId ? null : postId);
+    }, []);
+
+    const handleToggleMore = useCallback((postId) => {
+        setOpenMore(prev => prev === postId ? null : postId);
+    }, []);
+
+    const handleFollow = useCallback(async (userId) => {
         try {
-            await followUser(userId); 
+            await followUser(userId);
+            setOpenMore(null);
         } catch (err) {
             console.error("Error following user:", err);
-        } finally {
-            setOpenMore(null); 
         }
-    };
-  
+    }, [followUser]);
+
+    if (loading) {
+        return (
+            <div className="w-full shadow-md rounded-lg md:p-4 mt-6">
+                <h2 className="text-xl font-semibold mb-4">Public Feed</h2>
+                <div className="text-center py-8">Loading posts...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="w-full shadow-md rounded-lg md:p-4 mt-6">
+                <h2 className="text-xl font-semibold mb-4">Public Feed</h2>
+                <div className="text-center py-8 text-red-500">Error: {error}</div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full shadow-md rounded-lg md:p-4 mt-6">
             <h2 className="text-xl font-semibold mb-4">Public Feed</h2>
+            
             {posts.length > 0 ? (
                 posts.map((post) => (
-                    <div
+                    <PostItem
                         key={post._id}
-                        className="border-b border-gray-200 pb-4 mb-6 bg-white rounded-lg shadow-sm"
-                    >
-                        <div className="flex items-start justify-between ">
-                            <Link to={
-                                userData?._id === post.author._id
-                                    ? "/profile"
-                                    : `/profile/${post.author.username}`
-                            } className="flex items-center gap-3 p-4 cursor-pointer">
-                                <img
-                                    src={post.author?.profilePic || EmptyProfile}
-                                    alt="Author"
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
-                                <div>
-                                    <p className="font-semibold text-gray-800">
-                                        {post.author?.firstname} {post.author?.lastname}
-                                    </p>
-                                    <span className="text-gray-500 text-xs">
-                                        {timeAgo(post.createdAt)}
-                                    </span>
-                                </div>
-                            </Link>
-                            <div className="px-4 font-bold text-2xl text-gray-400 h-full">
-                                {userData?._id !== post.author._id && (
-                                    <span
-                                        className="cursor-pointer relative"
-                                        onClick={() =>
-                                            setOpenMore(openMore === post._id ? null : post._id)
-                                        }
-                                    >
-                                        ...
-                                        {openMore === post._id && (
-                                            <div className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col gap-2 text-sm"
-                                                onMouseLeave={() => setOpenMore((prev) => !prev)}
-                                            >
-                                                <button className="cursor-pointer">Connect</button>
-                                                <button
-                                                    className="cursor-pointer"
-                                                    onClick={() => handleFollow(post.author._id)}
-                                                    // onClick={() => alert("button clicked")}
-                                                    disabled={following?.some(f => f._id === post.author._id)}
-                                                >
-                                                    {following?.some(f => f._id === post.author._id)
-                                                        ? "Following"
-                                                        : "Follow"}
-                                                </button>
-                                            </div>
-                                        )}
-                                    </span>
-                                )}
-                            </div>
-
-                        </div>
-
-                        <div className="px-4">
-                            <p className="text-gray-800 text-sm">{post.description}</p>
-                            {post?.hashtags && post.hashtags.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-1">
-                                    {post.hashtags.map((tag, index) => (
-                                        <span key={index} className="text-blue-600 text-sm">
-                                            #{tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {post?.image && (
-                            <div className="mt-3">
-                                <img
-                                    src={post.image}
-                                    alt="Post"
-                                    className="w-full rounded-lg object-cover"
-                                />
-                            </div>
-                        )}
-
-                        <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-600">
-                            <span>{post.likes.length} Likes</span>
-                            <span>{post.commentCount || post.comments?.length || 0} Comments</span>
-                        </div>
-
-                        <div className="border-t-2 mx-4 flex items-center justify-between text-gray-600 text-sm">
-                            <button
-                                onClick={() => handleLike(post._id)}
-                                className="flex items-center gap-1 py-2 hover:bg-gray-100 w-full justify-center"
-                            >
-                                {post.likes.includes(userData?._id) ? (
-                                    <BiSolidLike className="text-blue-500 text-lg" />
-                                ) : (
-                                    <BiLike className="text-lg" />
-                                )}
-                                <span>Like</span>
-                            </button>
-
-                            <button
-                                className="flex items-center gap-1 py-2 px-4 hover:bg-gray-100 w-full justify-center"
-                                onClick={() =>
-                                    setOpenComments(openComments === post._id ? null : post._id)
-                                }
-                            >
-                                <FaRegComment className="text-lg" />
-                                <span>Comment</span>
-                            </button>
-
-                            <button className="flex items-center gap-1 py-2 px-4 hover:bg-gray-100 w-full justify-center">
-                                <BiRepost className="text-lg" />
-                                <span>Repost</span>
-                            </button>
-
-                            <button className="flex items-center gap-1 py-2 hover:bg-gray-100 w-full justify-center">
-                                <LuSend className="text-lg" />
-                                <span>Send</span>
-                            </button>
-                        </div>
-
-                        {openComments === post._id && (
-                            <CommentSection
-                                post={post}
-                                serverUrl={serverUrl}
-                                token={localStorage.getItem("token")}
-                                userData={userData}
-                                setPosts={setPosts}
-                            />
-                        )}
-                    </div>
+                        post={post}
+                        likePost={handleLike}
+                        onToggleComments={handleToggleComments}
+                        onFollow={handleFollow}
+                        onToggleMore={handleToggleMore}
+                        openComments={openComments}
+                        openMore={openMore}
+                        userData={userData} 
+                    />
                 ))
             ) : (
-                <p className="text-gray-500">No posts available.</p>
+                <p className="text-gray-500 text-center py-8">No posts available.</p>
             )}
         </div>
     );
 };
 
-export default PublicFeed;
+export default React.memo(PublicFeed);

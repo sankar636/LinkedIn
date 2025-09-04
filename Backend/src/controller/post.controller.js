@@ -120,41 +120,35 @@ const getUserPosts = AsyncHandler(async (req, res) => {
 
 const likePosts = AsyncHandler(async (req, res) => {
     const { id } = req.params;
-    // console.log("postId",id);    
     const userId = req.user._id;
     const post = await Post.findById(id);
     if (!post) {
         throw new ApiError(400, "Post not Found");
     }
 
-    let updatedPost;
-    if (post.likes.includes(userId)) {
-        // Unlike post
-        console.log("Dislike");
-        // post.likes = post.likes.filter((id) => id.toString() !== userId.toString())
-        updatedPost = await Post.findByIdAndUpdate(
-            id,
-            { $pull: { likes: userId } },
-            { new: true }
-        );
-    } else {
-        //Like
-        console.log("Like");
-        // post.likes.push(userId)
-        updatedPost = await Post.findByIdAndUpdate(
-            id,
-            { $addToSet: { likes: userId } }, // ensures no duplicates
-            { new: true }
-        );
+    const isAlreadyLiked = post.likes.includes(userId);
+
+    const updateOperation = isAlreadyLiked
+        ? { $pull: { likes: userId } } // Unlike
+        : { $addToSet: { likes: userId } }; // Like
+
+    const updatedPost = await Post.findByIdAndUpdate(
+        id,
+        updateOperation,
+        { new: true }
+    ).populate("author", "firstname lastname username headLine profileImage"); // Re-populate the author
+    
+    if (!updatedPost) {
+        throw new ApiError(500, "Failed to update post like status");
     }
 
-    await post.save()
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, "Post like status updated", { likes: post.likes.length }));
+    return res.status(200).json(
+        new ApiResponse(200, "Post like status updated", {
+            updatedPost: updatedPost
+        })
+    );
 })
 
 
 
-export { createPost, updatePost, deletePost, getAllPosts, getUserPosts, likePosts};
+export { createPost, updatePost, deletePost, getAllPosts, getUserPosts, likePosts };

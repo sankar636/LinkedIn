@@ -1,140 +1,153 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { AuthDataContext } from './AuthContext';
 import axios from 'axios';
 
 export const UserDataContext = createContext();
-
-const UserContext = ({ children }) => {
-    const [loading, setLoading] = useState(true);
+export const useUser = () => {
+  const context = useContext(UserDataContext);
+  if (!context) {
+    throw new Error('useUser must be used within a UserContext');
+  }
+  return context;
+};
+const UserProvider = ({ children }) => {
     const { serverUrl } = useContext(AuthDataContext);
-    const [edit, setEdit] = useState(false);
     const [userData, setUserData] = useState(null);
     const [profileData, setProfileData] = useState(null);
     const [userPosts, setUserPosts] = useState([]);
-    const [error, setError] = useState("");
-    const [loadingProfile, setLoadingProfile] = useState(true);
     const [followers, setFollowers] = useState(null);
     const [following, setFollowing] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [loadingProfile, setLoadingProfile] = useState(false);
+    const [error, setError] = useState("");
+    const [edit, setEdit] = useState(false);
 
-    const token = localStorage.getItem("token");
-    const getCurrentUser = async () => {
+    const getToken = () => localStorage.getItem("token");
+    const getCurrentUser = useCallback(async () => {
+        setLoading(true);
+        const token = getToken();
+        if (!token) {
+            setUserData(null);
+            setLoading(false);
+            return;
+        }
         try {
-            if (!token) {
-                setUserData(null);
-                setLoading(false);
-                return;
-            }
-            const result = await axios.get(`${serverUrl}/user/currentuser`, {
+            const { data } = await axios.get(`${serverUrl}/user/currentuser`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
-            if (result.data.statusCode === 200) {
-                setUserData(result.data.data.user);
+            if (data.statusCode === 200) {
+                setUserData(data.data.user);
+            } else {
+                setUserData(null);
             }
-        } catch (error) {
+        } catch (err) {
             setUserData(null);
+            setError("Failed to fetch user data.");
         } finally {
             setLoading(false);
         }
-    };
-    const getUserProfile = async (username) => {
+    }, [serverUrl]);
+    const getUserProfile = useCallback(async (username) => {
         setLoadingProfile(true);
         try {
-            const response = await axios.get(`${serverUrl}/user/profile/${username}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            const token = getToken();
+            const { data } = await axios.get(`${serverUrl}/user/profile/${username}`, {
+                headers: { Authorization: `Bearer ${token}` }
             });
-            const data = response.data.data.user;
-            const posts = response.data.data.posts;
-
-            setProfileData(data);
-            setUserPosts(posts);
+            setProfileData(data.data.user);
+            setUserPosts(data.data.posts);
             setError("");
         } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.message || "Failed to fetch profile data.");
             setProfileData(null);
             setUserPosts([]);
+            setError(err.response?.data?.message || "Failed to fetch profile data.");
         } finally {
             setLoadingProfile(false);
         }
-    };
-    const updateUserProfile = async (formData) => {
+    }, [serverUrl]);
+    const updateUserProfile = useCallback(async (formData) => {
         try {
-            const response = await axios.put(`${serverUrl}/user/updateprofile`, formData, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            const token = getToken();
+            const { data } = await axios.put(`${serverUrl}/user/updateprofile`, formData, {
+                headers: { Authorization: `Bearer ${token}` },
             });
-            if (response.data.statusCode === 200) {
-                setUserData(response.data.data.user);
+            if (data.statusCode === 200) {
+                setUserData(data.data.user);
             }
-        } catch (error) {
-            console.error("Error updating profile:", error);
+        } catch (err) {
+            setError("Error updating profile.");
         }
-    };
+    }, [serverUrl]);
 
-    const followUser = async (followedUserId) => {
+    const followUser = useCallback(async (followedUserId) => {
         try {
-            const response = await axios.post(
+            const token = getToken();
+            await axios.post(
                 `${serverUrl}/user/${followedUserId}/follow`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            console.log("follow User Respose", response.data.data);
-            const data = response.data.data;
-            
-            if (profileData && profileData._id === followedUserId) { // update profile
+            // Refresh profile if viewing the followed user
+            if (profileData && profileData._id === followedUserId) {
                 await getUserProfile(profileData.username);
             }
-
+            // Update userData.following immediately for UI responsiveness
+            setUserData(prev => {
+                if (!prev) return prev;
+                // Avoid duplicates
+                if (prev.following?.includes(followedUserId)) return prev;
+                return {
+                    ...prev,
+                    following: [...(prev.following || []), followedUserId]
+                };
+            });
         } catch (err) {
-            console.error("Error following user:", err);
             setError("Failed to follow user. Please try again.");
         }
-    }
+    }, [serverUrl, profileData, getUserProfile]);
 
-    const getFollower = async () => {
+    const getFollower = useCallback(async () => {
         try {
-            const response = await axios.get(`${serverUrl}/user/followUser`,
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            )
-            console.log("Follower", response.data.data);
-            const data = response.data.data;
-            setFollowers(data.followers);
-            setFollowing(data.following);
-
-        } catch (error) {
-
+            const token = getToken();
+            const { data } = await axios.get(`${serverUrl}/user/followUser`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setFollowers(data.data.followers);            
+            setFollowing(data.data.following);
+        } catch (err) {
+            setError("Failed to fetch followers.");
         }
-    }
+    }, [serverUrl]);
 
     useEffect(() => {
         getCurrentUser();
-    }, []);
-
-
+    }, [getCurrentUser]);
+    const contextValue = useMemo(() => ({
+        userData,
+        setUserData,
+        loading,
+        loadingProfile,
+        error,
+        edit,
+        setEdit,
+        updateUserProfile,
+        profileData,
+        userPosts,
+        getUserProfile,
+        followers,
+        following,
+        getFollower,
+        followUser
+    }), [
+        userData, loading, loadingProfile, error, edit, profileData, userPosts,
+        followers, following, updateUserProfile, getUserProfile, getFollower, followUser
+    ]);
 
     return (
-        <UserDataContext.Provider value={{
-            userData,
-            setUserData,
-            loading,
-            loadingProfile,
-            error,
-            edit,
-            setEdit,
-            updateUserProfile,
-            profileData,
-            userPosts,
-            getUserProfile,
-            followers,
-            following,
-            getFollower,
-            followUser
-        }}>
+        <UserDataContext.Provider value={contextValue}>
             {children}
         </UserDataContext.Provider>
     );
 };
 
-export default UserContext;
+export default UserProvider;

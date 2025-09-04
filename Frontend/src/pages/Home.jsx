@@ -7,9 +7,10 @@ import { MdOutlineEdit } from "react-icons/md";
 import EditProfile from '../components/EditProfile';
 import PostPopup from '../components/PostPupUp';
 import PublicFeed from '../components/PublicFeed';
+import { useUser } from '../context/UserContext';
 
 const Home = () => {
-  const { userData, setUserData, edit, setEdit } = useContext(UserDataContext)
+  const { userData, setUserData, edit, setEdit } = useUser()
   const [openPostPopup, setOpenPostPopup] = useState(false);
 
   return (
