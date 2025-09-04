@@ -11,8 +11,8 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }) => {
-    const serverUrl = 'http://localhost:4000/api'
-    // const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
+    // const serverUrl = 'http://localhost:4000/api'
+    const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
 
     let value = {
         serverUrl
