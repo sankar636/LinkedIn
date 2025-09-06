@@ -42,8 +42,8 @@ router.route('/delete/:postId').delete(
     deletePost
 );
 
-router.get("/all", getAllPosts);
-router.get("/user/:userId", getUserPosts);
+router.get("/all",verifyJWT, getAllPosts);
+router.get("/user/:userId",verifyJWT, getUserPosts);
 
 router.post("/:id/like",verifyJWT, likePosts)
 
