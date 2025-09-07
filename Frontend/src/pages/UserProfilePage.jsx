@@ -1,12 +1,6 @@
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { FiBriefcase, FiBookOpen } from "react-icons/fi";
-import EmptyProfile from '/EmptyProfile.svg';
-import { MdOutlineEdit } from "react-icons/md";
-import { UserDataContext } from "../context/UserContext";
-import { PostContext } from "../context/PostContext";
 import UserProfile from "../components/UserProfile";
 
 const UserProfilePage = () => {

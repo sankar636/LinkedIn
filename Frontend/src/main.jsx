@@ -7,6 +7,7 @@ import AuthContext from './context/AuthContext.jsx'
 import UserContext from './context/UserContext.jsx'
 import PostProvider from './context/PostContext.jsx'
 import SocketProvider from './context/SocketContext.jsx'
+import ConnectionProvider from './context/ConnectionContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')).render(
         <UserContext>
           <SocketProvider>
             <PostProvider>
-              <App />
+              <ConnectionProvider>
+                <App />
+              </ConnectionProvider>
             </PostProvider>
           </SocketProvider>
         </UserContext>
