@@ -51,5 +51,8 @@ app.use('/api/post', postRouter)
 import commentsRouter from './routes/comments.route.js'
 app.use('/api/comments', commentsRouter);
 
+import connectionRouter from './routes/connection.route.js'
+app.use('/api/connections', connectionRouter)
+
 
 export { app }
