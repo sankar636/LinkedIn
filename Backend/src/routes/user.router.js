@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import { Router } from "express";
 import verifyJWT from "../middleware/auth.middleware.js";
-import { getCurrentUser, updateProfile, getUserAccountProfile, followUser, getFollowUser } from "../controller/user.controller.js";
+import { getCurrentUser, updateProfile, getUserAccountProfile, followUser, getFollowUser, getProfileById } from "../controller/user.controller.js";
 
 
 const router = Router();
@@ -19,6 +19,10 @@ router.route('/updateprofile').put(
 router.route('/profile/:username').get(
     verifyJWT, 
     getUserAccountProfile
+);
+router.route('/profileById/:id').get(
+    verifyJWT, 
+    getProfileById
 );
 
 router.route('/:id/follow').post(
