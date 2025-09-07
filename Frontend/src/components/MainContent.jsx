@@ -1,5 +1,5 @@
 import React from 'react';
-// import ConnectionView from './ConnectionView';
+import ConnectionView from './ConnectionView';
 import FollowView from './FollowView';
 // import GroupsView from './GroupsView';
 // import EventsView from './EventsView';
@@ -11,7 +11,7 @@ import FollowView from './FollowView';
 
 const MainContent = ({ activeTab }) => {
     const contentViews = {
-        // connections: <ConnectionView />,
+        connections: <ConnectionView />,
         followingfollowers: <FollowView />,
         // groups: <GroupsView />,
         // events: <EventsView />,
