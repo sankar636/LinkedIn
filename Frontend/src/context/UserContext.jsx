@@ -4,11 +4,11 @@ import axios from 'axios';
 
 export const UserDataContext = createContext();
 export const useUser = () => {
-  const context = useContext(UserDataContext);
-  if (!context) {
-    throw new Error('useUser must be used within a UserContext');
-  }
-  return context;
+    const context = useContext(UserDataContext);
+    if (!context) {
+        throw new Error('useUser must be used within a UserContext');
+    }
+    return context;
 };
 const UserProvider = ({ children }) => {
     const { serverUrl } = useContext(AuthDataContext);
@@ -22,7 +22,7 @@ const UserProvider = ({ children }) => {
     const [error, setError] = useState("");
     const [edit, setEdit] = useState(false);
 
-    const getToken = () => localStorage.getItem("token");
+    const getToken = useCallback(() => localStorage.getItem("token"), []);
     const getCurrentUser = useCallback(async () => {
         setLoading(true);
         const token = getToken();
@@ -49,13 +49,43 @@ const UserProvider = ({ children }) => {
     }, [serverUrl]);
     const getUserProfile = useCallback(async (username) => {
         setLoadingProfile(true);
+        if(!username){
+            setError("Username is required to fetch Profile Data");
+        }
         try {
             const token = getToken();
             const { data } = await axios.get(`${serverUrl}/user/profile/${username}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setProfileData(data.data.user);
+            const userData = data.data.user
+            // console.log(userData);
+            setProfileData(userData);
             setUserPosts(data.data.posts);
+            setError("");
+        } catch (err) {
+            console.log(err);
+            setProfileData(null);
+            setUserPosts([]);
+            setError(err.response?.data?.message || "Failed to fetch profile data.");
+        } finally {
+            setLoadingProfile(false);
+        }
+    }, [serverUrl, getToken]);
+    const getUserProfileById = useCallback(async (userId) => {
+        setLoadingProfile(true);
+        if (!userId) {
+            setError("User ID is required to fetch Profile Data");
+            setLoadingProfile(false);
+            return;
+        }
+        try {
+            const token = getToken();
+            const { data } = await axios.get(`${serverUrl}/user/profileById/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // console.log(data);
+            const userData = data.data.user
+            return userData
             setError("");
         } catch (err) {
             setProfileData(null);
@@ -64,7 +94,7 @@ const UserProvider = ({ children }) => {
         } finally {
             setLoadingProfile(false);
         }
-    }, [serverUrl]);
+    }, [serverUrl, getToken]);
     const updateUserProfile = useCallback(async (formData) => {
         try {
             const token = getToken();
@@ -112,7 +142,7 @@ const UserProvider = ({ children }) => {
             const { data } = await axios.get(`${serverUrl}/user/followUser`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setFollowers(data.data.followers);            
+            setFollowers(data.data.followers);
             setFollowing(data.data.following);
         } catch (err) {
             setError("Failed to fetch followers.");
@@ -134,13 +164,14 @@ const UserProvider = ({ children }) => {
         profileData,
         userPosts,
         getUserProfile,
+        getUserProfileById, 
         followers,
         following,
         getFollower,
         followUser
     }), [
         userData, loading, loadingProfile, error, edit, profileData, userPosts,
-        followers, following, updateUserProfile, getUserProfile, getFollower, followUser
+        followers, following, updateUserProfile, getUserProfile, getUserProfileById, getFollower, followUser
     ]);
 
     return (
