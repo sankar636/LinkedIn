@@ -54,5 +54,8 @@ app.use('/api/comments', commentsRouter);
 import connectionRouter from './routes/connection.route.js'
 app.use('/api/connections', connectionRouter)
 
+import notificationRouter from './routes/notification.route.js'
+app.use('/api/notifications', notificationRouter)
+
 
 export { app }
