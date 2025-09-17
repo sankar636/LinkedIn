@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import { FaUser, FaUserCheck, FaUserPlus } from 'react-icons/fa';
+import EmptyState from './EmptyState';
 
 const FollowView = () => {
   const { followers = [], following = [], getFollower, followUser, unfollowUser, userData } = useUser();
@@ -101,8 +102,6 @@ const FollowView = () => {
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Connections</h1>
-
-        {/* Tab Navigation */}
         <div className="flex border-b border-gray-200 mb-6">
           <button
             className={`py-2 px-4 font-medium text-sm flex items-center ${activeTab === 'followers' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
@@ -129,8 +128,6 @@ const FollowView = () => {
             {error}
           </div>
         )}
-
-        {/* Followers List */}
         {activeTab === 'followers' && (
           <div role="tabpanel" aria-labelledby="followers-tab">
             <h2 className="text-lg font-semibold text-gray-700 mb-4">People following you</h2>
@@ -156,8 +153,6 @@ const FollowView = () => {
             )}
           </div>
         )}
-
-        {/* Following List */}
         {activeTab === 'following' && (
           <div role="tabpanel" aria-labelledby="following-tab">
             <h2 className="text-lg font-semibold text-gray-700 mb-4">People you're following</h2>
@@ -187,16 +182,5 @@ const FollowView = () => {
     </div>
   );
 };
-
-// Empty state component for reuse
-const EmptyState = ({ icon, title, description }) => (
-  <div className="text-center py-10">
-    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-      {icon}
-    </div>
-    <h3 className="text-lg font-medium text-gray-700 mb-1">{title}</h3>
-    <p className="text-gray-500">{description}</p>
-  </div>
-);
 
 export default FollowView;

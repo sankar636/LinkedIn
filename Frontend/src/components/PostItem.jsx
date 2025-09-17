@@ -5,10 +5,11 @@ import { LuSend } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import CommentSection from "./CommentSection";
 import EmptyProfile from "/EmptyProfile.svg";
+// import { useConnections } from "../context/ConnectionContext";
 
 const PostItem = React.memo(({
     post,
-    likePost, // <-- use onLike for consistency
+    likePost,
     onToggleComments,
     onFollow,
     onToggleMore,
@@ -16,7 +17,31 @@ const PostItem = React.memo(({
     openMore,
     userData,
 }) => {
-    
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        setError(null); 
+    }, [post]);
+
+    const handleSendRequest = async(userId) => {
+        setError(null);
+        try {
+            await sendConnectionRequest(userId);
+            onToggleMore(null)
+        } catch (error) {
+            setError("Failed to send connection request.");
+            console.log("Error sending Connection request ", error);
+        }
+    }
+    const handleAcceptRequest = async (userId) => {
+        try {
+            await acceptConnection(userId);
+            onToggleMore(null); 
+        } catch (err) {
+            setError("Failed to accept request.");
+            console.error("Error accepting connection request:", err);
+        }
+    };
     function timeAgo(date) {
         const seconds = Math.floor((new Date() - new Date(date)) / 1000);
         let interval = Math.floor(seconds / 31536000);
@@ -57,7 +82,33 @@ const PostItem = React.memo(({
         post.likes?.includes(userData._id),
         [post.likes, userData?._id]
     );
-    
+
+    // Connection status logic
+    // const isConnected = useMemo(() =>
+    //     connections.some(conn => conn.id === authorId),
+    //     [connections, authorId]
+    // );
+    // const isPending = useMemo(() =>
+    //     outgoingRequests.includes(authorId),
+    //     [outgoingRequests, authorId]
+    // );
+    // const isRequestReceived = useMemo(() =>
+    //     connectionRequests.some(req => req.id === authorId),
+    //     [connectionRequests, authorId]
+    // );
+
+    const renderConnectionButton = () => {
+        if (isConnected) {
+            return <button disabled className="text-green-600">Connected</button>;
+        }
+        if (isPending) {
+            return <button disabled className="text-gray-500">Pending</button>;
+        }
+        if (isRequestReceived) {
+            return <button onClick={() => handleAcceptRequest(authorId)} className="cursor-pointer font-semibold text-blue-600">Accept Request</button>;
+        }
+        return <button onClick={() => handleSendRequest(authorId)} className="cursor-pointer">Connect</button>;
+    };
 
     return (
         <div className="border-b border-gray-200 pb-4 mb-6 bg-white rounded-lg shadow-sm">
@@ -76,21 +127,18 @@ const PostItem = React.memo(({
                     </div>
                 </Link>
 
-                {!isOwnPost && (
+                {/* {!isOwnPost && (
                     <div className="px-4 font-bold text-2xl text-gray-400 h-full">
-                        <span
-                            className="cursor-pointer relative"
-                            onClick={() => onToggleMore(post._id)}
-                        >
+                        <span className="cursor-pointer relative" onClick={() => onToggleMore(post._id)}>
                             ...
                             {openMore === post._id && (
                                 <div
-                                    className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col gap-2 text-sm"
+                                    className="absolute top-10 right-0 bg-white shadow-2xl p-4 text-black font-medium flex flex-col items-start gap-3 text-sm rounded-md z-10"
                                     onMouseLeave={() => onToggleMore(null)}
                                 >
-                                    <button className="cursor-pointer">Connect</button>
+                                    {renderConnectionButton()}
                                     <button
-                                        className= {`${isFollowing ? "bg-gray-300 text-red-600 cursor-not-allowed" : "border border-gray-400 hover:bg-gray-100"} px-4 py-1 rounded-full text-sm font-semibold`}
+                                        className={`${isFollowing ? "text-gray-500" : ""}`}
                                         onClick={() => onFollow(authorId)}
                                         disabled={isFollowing}
                                     >
@@ -100,7 +148,7 @@ const PostItem = React.memo(({
                             )}
                         </span>
                     </div>
-                )}
+                )} */}
             </div>
 
             <div className="px-4">
