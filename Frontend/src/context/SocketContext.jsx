@@ -36,7 +36,7 @@ const SocketProvider = ({ children }) => {
             newSocket.on('connection-request', (notificationData) => {
                 console.log("SocketProvider received connection-request:", notificationData);
                 // setNotifications((prevNotifications) => [...prevNotifications, notificationData]);
-                console.log(notifications);
+                // console.log(notificationData);
 
                 toast.success(
                     `${notificationData.sender?.firstname || 'Someone'} sent you a connection request!`,
@@ -48,11 +48,21 @@ const SocketProvider = ({ children }) => {
             newSocket.on('Request_Accepted', (notificationData) => {
                 console.log("SocketProvider received Request_Accepted:", notificationData);
                 // setNotifications((prevNotifications) => [...prevNotifications, notificationData]);
-                console.log(notifications);
+                // console.log(notificationData);
                 toast.success(
                     `${notificationData.sender?.firstname || 'Someone'} accepted your connection request!`,
                     {
                         duration: 4000
+                    }
+                );
+            });
+            newSocket.on('Post_Like', (notificationData) => {
+                console.log("SocketProvider received Post_Like:", notificationData);
+                // console.log(notificationData);
+                toast.success(
+                    `${notificationData.sender?.firstname || 'Someone'} Liked Your Post!`,
+                    {
+                        duration: 2000
                     }
                 );
             });
