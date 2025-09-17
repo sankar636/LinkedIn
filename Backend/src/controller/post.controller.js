@@ -4,6 +4,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 import { validationResult } from "express-validator";
+import { sendMessageToUser, getReceiverSocketId } from "../socket.js";
+import Notification from "../models/notification.model.js";
+
 
 // Create Post
 const createPost = AsyncHandler(async (req, res) => {
@@ -140,6 +143,36 @@ const likePosts = AsyncHandler(async (req, res) => {
     
     if (!updatedPost) {
         throw new ApiError(500, "Failed to update post like status");
+    }
+
+    if (!isAlreadyLiked) {
+        const recipientId = post.author;
+        const recipientSocketId = getReceiverSocketId(recipientId);
+        const isRecipientOnline = !!recipientSocketId;
+
+        const notification = await Notification.create({
+            receiver: recipientId,
+            sender: userId,
+            content: "Post_Like",
+            post: id, 
+            isNew: !isRecipientOnline,
+        });
+
+        if (!notification) {
+            throw new ApiError(500, "Notification could not be created");
+        }
+
+        if (isRecipientOnline) {
+            const populatedNotification = await Notification.findById(notification._id)
+                .populate("sender", "firstname lastname username")
+                .populate("post", "description"); 
+                console.log(populatedNotification);
+                            
+            sendMessageToUser(recipientId, {
+                event: 'Post_Like',
+                data: populatedNotification 
+            });
+        }
     }
 
     return res.status(200).json(

@@ -8,7 +8,8 @@ const getNotifications = AsyncHandler(async (req, res) => {
     const userId = req.user._id;
     
     const notifications = await Notification.find({ receiver: userId })
-        .populate("sender", "firstname lastname profilePic headLine") 
+        .populate("sender", "firstname lastname profilePic headLine username")
+        .populate("post", "description")
         .sort({ createdAt: -1 }); 
     if(!notifications){
         throw new ApiError(400, "Error wiile getting notification")

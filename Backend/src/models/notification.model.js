@@ -22,6 +22,10 @@ const notificationSchema = new Schema(
                 "New_Comment"
             ]
         },
+        post: {
+            type: mongoose.Types.ObjectId,
+            ref: "Post"
+        },
         read: {
             type: Boolean,
             default: false
