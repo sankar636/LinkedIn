@@ -1,20 +1,44 @@
-import React from 'react';
-import EmptyProfile from "/EmptyProfile.svg"; 
+import React, { useEffect, useMemo } from 'react';
+import EmptyProfile from "/EmptyProfile.svg";
+import { useUser } from '../context/UserContext';
+import { Link } from 'react-router-dom';
 
 const ConnectionCard = ({ connection, isRequest, onAccept, onIgnore, onConnect, connectionStatus }) => {
+    const { getUserProfileById, userData } = useUser();
+    useEffect(() => {
+        if (connection && connection._id) {
 
+            getUserProfileById(connection._id);
+        }
+    }, [connection, getUserProfileById]);
+    console.log(connection);
+    
+    const handleClick = () => {
+        if (connection && connection._id) {
+            getUserProfileById(connection._id);
+        }
+    };
+    const isOwnPost = useMemo(() =>
+        userData?._id === connection._id,
+        [userData?._id, connection._id]
+    );
+
+    const profileLink = useMemo(() =>
+        isOwnPost ? "/profile" : `/profile/${connection.title}`,
+        [isOwnPost, connection.title]
+    );
     const renderButtons = () => {
         if (isRequest && connectionStatus === "pending") {
             // Invitation: Accept & Ignore
             return (
                 <div className="flex space-x-2">
-                    <button 
+                    <button
                         onClick={() => onIgnore(connection.id)}
                         className="px-4 py-1 border border-gray-400 rounded-full text-sm font-semibold hover:bg-gray-200"
                     >
                         Ignore
                     </button>
-                    <button 
+                    <button
                         onClick={() => onAccept(connection.id)}
                         className="px-4 py-1 bg-blue-500 text-white rounded-full text-sm font-semibold hover:bg-blue-600"
                     >
@@ -50,7 +74,7 @@ const ConnectionCard = ({ connection, isRequest, onAccept, onIgnore, onConnect, 
         }
         // Default: show connect button
         return (
-            <button 
+            <button
                 className="px-4 py-1 border border-gray-400 rounded-full text-sm font-semibold text-blue-600 hover:bg-gray-100"
                 onClick={() => onConnect(connection.id)}
             >
@@ -61,10 +85,11 @@ const ConnectionCard = ({ connection, isRequest, onAccept, onIgnore, onConnect, 
 
     return (
         <div className="flex items-center justify-between p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-50">
-            <div className="flex items-center">
+            <Link to={profileLink} className="flex items-center">
                 <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-3 overflow-hidden">
-                    <img 
-                        src={connection.profileImage || EmptyProfile} 
+                    <img
+
+                        src={connection.profileImage || EmptyProfile}
                         alt={connection.name}
                         className="w-full h-full object-cover"
                     />
@@ -73,7 +98,7 @@ const ConnectionCard = ({ connection, isRequest, onAccept, onIgnore, onConnect, 
                     <h3 className="font-semibold text-gray-800">{connection.name}</h3>
                     <p className="text-sm text-gray-600">{connection.title || 'User'}</p>
                 </div>
-            </div>
+            </Link>
             {renderButtons()}
         </div>
     );
