@@ -82,7 +82,10 @@ const userSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
         }
-    ]
+    ],
+    socketId: {
+        type: String
+    }
 },
     { timestamps: true }
 )
