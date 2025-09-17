@@ -1,21 +1,37 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdOutlineEdit } from "react-icons/md";
 import { FiBriefcase, FiBookOpen } from "react-icons/fi";
 import EmptyProfile from '/EmptyProfile.svg';
 import { useUser } from '../context/UserContext.jsx';
 import { useConnections } from '../context/ConnectionContext.jsx';
+import { SocketContext } from '../context/SocketContext';
+
 
 const UserProfile = ({ username }) => {
     const {userData: loggedInUser, profileData, userPosts, loadingProfile, error, setEdit, getUserProfile} = useUser();
     const { sendConnectionRequest, fetchConnections, acceptConnection, connections, connectionRequests, ignoreConnection, ignoreRequests, outgoingRequests } = useConnections();
     const navigate = useNavigate();
     const [connectionError, setConnectionError] = useState(null)
+    const { socket } = useContext(SocketContext);
+    
     // console.log("Connections",connections);
     // console.log("Request",connectionRequests);
     // console.log("Outgoing",outgoingRequests);
     // console.log("ignored",ignoreRequests);
-    
+
+    // useEffect(() => {
+    //     if(socket && loggedInUser?.id){
+    //       socket.emit('join', { userId: loggedInUser?._id });
+    //       console.log("Socket joined with userId:", loggedInUser?._id);
+          
+    //     }
+    //   },[socket, loggedInUser])
+      
+    //   socket.on('notification', (data) => {
+    //     console.log("New notification received:", data);
+        
+    //   })
     const handleSendRequest = async(userId) => {
         setConnectionError(null);
         try {

@@ -7,20 +7,13 @@ import PostItem from "./PostItem";
 const PublicFeed = () => {
     const { posts, loading, error, likePost, fetchPosts } = usePosts();
     const { userData, followUser } = useUser();    
-    const [openComments, setOpenComments] = React.useState(null);
-    const [openMore, setOpenMore] = React.useState(null);
+    const [openComments, setOpenComments] = useState(null);
+    const [openMore, setOpenMore] = useState(null);
 
-    // Fetch posts on mount
     useEffect(() => {
         fetchPosts();
     }, [fetchPosts]);
 
-    // const sortedPosts = useMemo(() => 
-    //     [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    //     [posts]
-    // );
-
-    // Memoized event handlers
     const handleLike = useCallback(async (postId) => {
         try {
             await likePost(postId);
