@@ -1,16 +1,52 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { FiBriefcase, FiBookOpen } from "react-icons/fi";
+import { FiBriefcase, FiBookOpen, FiCamera, FiPlus } from "react-icons/fi";
 import EmptyProfile from '/EmptyProfile.svg';
 import { MdOutlineEdit } from "react-icons/md";
 import { UserDataContext } from "../context/UserContext";
 import { PostContext } from "../context/PostContext";
+import { AuthDataContext } from "../context/AuthContext";
+import { UploadImage } from "../Utils/UploadImage";
 
 const Profile = () => {
     const { userData, setEdit } = useContext(UserDataContext);
     const { posts } = useContext(PostContext);
+    const { serverUrl } = useContext(AuthDataContext);
     const navigate = useNavigate();
+
+    const profileInputRef = useRef(null);
+    const coverInputRef = useRef(null);
+
+    const handleProfileFileChange = async (e) => {
+        const file = e.target.files[0]
+        if(!file) return
+        try {
+            const response = await UploadImage({
+                file: file,
+                uploadUrl: `${serverUrl}/user/profileImage`,
+                fieldName: 'profileImage',
+                token: localStorage.getItem('token'),
+            });
+        } catch (error) {
+            
+        }
+    }
+
+    const handleCoverFileChange = async (e) => {
+        const file = e.target.files[0]
+        if(!file) return
+        try {
+            const response = await UploadImage({
+                file: file,
+                uploadUrl: `${serverUrl}/user/coverImage`,
+                fieldName: 'coverImage',
+                token: localStorage.getItem('token'),
+            });
+        } catch (error) {
+            
+        }
+    }
 
     if (!userData) {
         return (
@@ -23,22 +59,49 @@ const Profile = () => {
     // Filter posts of the current user
     const userPosts = posts.filter(post => post.author?._id === userData._id);
     // console.log(userPosts);
-    
+
 
     return (
         <div className="bg-gray-100 min-h-screen w-full pt-[90px] flex flex-col items-center">
             <Navbar />
+            <input
+                type="file"
+                ref={profileInputRef}
+                onChange={handleProfileFileChange}
+                className="hidden"
+                accept="image/*"
+            />
+            <input
+                type="file"
+                ref={coverInputRef}
+                onChange={handleCoverFileChange}
+                className="hidden"
+                accept="image/*"
+            />
             <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 my-4">
                 <div className="relative">
-                    <div className="w-full h-[150px] bg-gray-300 rounded overflow-hidden">
+                    <div className="w-full h-[150px] bg-gray-300 rounded overflow-hidden"
+                    
+                    >
                         <img src={userData.coverImage || " "} alt="Cover" className="w-full h-full object-cover" />
+                    </div>
+                    <div className='absolute right-[20px] top-[20px] w-[25px] cursor-pointer hover:text-xl'
+                    onClick={() => coverInputRef.current.click()}
+                    >
+                        <FiCamera />
                     </div>
                     <div className="w-[100px] h-[100px] rounded-full overflow-hidden absolute top-[100px] left-[30px] border-4 border-white shadow-md">
                         <img
-                            src={userData.profilePic || EmptyProfile}
+                            src={userData.profileImage || EmptyProfile}
                             alt="Profile"
                             className="w-full h-full object-cover"
                         />
+
+                    </div>
+                    <div className='w-[24px] h-[24px] bg-red-500 rounded-full absolute left-[65px] justify-center items-center flex cursor-pointer hover:text-2xl'
+                    onClick={() => profileInputRef.current.click()}
+                    >
+                        <FiPlus className="transition-transform duration-500 ease-in-out hover:rotate-[360deg] " />
                     </div>
                 </div>
                 <div className="mt-16 flex justify-between items-start">

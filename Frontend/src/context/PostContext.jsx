@@ -44,25 +44,25 @@ const PostProvider = ({ children }) => {
     }
   }, [serverUrl, getToken]);
   // Create a new post
-  const createPost = useCallback(async (content) => {
+  const createPost = useCallback(async (formdata) => {
     try {
       setError(null);
       const token = getToken();
 
       const response = await axios.post(
         `${serverUrl}/post/create`,
-        { description: content },
+         formdata ,
         { headers: { Authorization: `Bearer ${token}` } }
       );      
       setPosts((prev) => [response.data.data, ...prev]);
-      return response.data.data.post; // Return the created post for immediate use
+      return response.data.data.post; 
     } catch (error) {
       // console.error("Error creating post:", error);
       setError(error.response?.data?.message || "Failed to create post");
-      throw error; // Re-throw for component-level handling
+      throw error; 
     }
   }, [serverUrl, getToken]);
-
+  
   // Update a post
   const updatePost = useCallback(async (postId, updates) => {
     try {
