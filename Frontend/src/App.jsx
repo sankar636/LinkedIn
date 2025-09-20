@@ -11,6 +11,7 @@ import MyNetwork from './pages/MyNetwork.jsx'
 import Notification from './pages/Notification.jsx'
 import { Toaster } from 'react-hot-toast';
 import NotificationHandler from './components/NotificationHandler.jsx'
+import ChatPage from './pages/ChatPage.jsx'
 
 
 const App = () => {
@@ -52,6 +53,13 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Notification />
+            </ProtectedRoute>
+          }
+        />
+        <Route path='/chatPage'
+          element={
+            <ProtectedRoute>
+              <ChatPage />
             </ProtectedRoute>
           }
         />
