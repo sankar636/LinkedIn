@@ -1,6 +1,7 @@
 import React, { useContext, useState, useRef, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AiFillHome, AiOutlineBell, AiOutlineSearch } from "react-icons/ai";
+import { RiMessage2Fill } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 import { FaUserFriends } from "react-icons/fa";
 import { HiX } from "react-icons/hi";
@@ -86,14 +87,15 @@ const Navbar = () => {
     const userProfileData = useMemo(() => ({
         name: `${userData?.firstname || ''} ${userData?.lastname || ''}`.trim(),
         headline: userData?.headline || '',
-        profilePic: userData?.profilePic || EmptyProfile
+        profileImage: userData?.profileImage || EmptyProfile
     }), [userData]);
 
     // Memoized navigation items configuration
     const navItems = useMemo(() => [
         { to: "/", icon: AiFillHome, label: "Home" },
         { to: "/network", icon: FaUserFriends, label: "Network" },
-        { to: "/notification", icon: AiOutlineBell, label: "Notifications" }
+        { to: "/notification", icon: AiOutlineBell, label: "Notifications" },
+        {to: "/chatPage", icon: RiMessage2Fill, label: "Message"}
     ], []);
 
     return (
@@ -143,7 +145,7 @@ const Navbar = () => {
                             <div className="absolute top-12 right-0 w-72 bg-white border rounded-lg shadow-lg p-4 z-50">
                                 <div className="flex flex-col items-center justify-around gap-3 pb-3 border-b">
                                     <img
-                                        src={userProfileData.profilePic}
+                                        src={userProfileData.profileImage}
                                         alt="Profile"
                                         className="w-20 h-20 rounded-full object-cover"
                                     />

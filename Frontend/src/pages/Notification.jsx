@@ -10,9 +10,8 @@ import axios from 'axios';
 import { AuthDataContext } from '../context/AuthContext.jsx';
 
 const getNotificationDetails = (notification) => {
-    const { content, sender, post } = notification;
-    const senderName = `${sender?.firstname || 'Someone'} ${sender?.lastname || ''}`;
-    
+    const { content, sender, post, comment } = notification;
+    const senderName = `${sender?.firstname || 'Someone'} ${sender?.lastname || ''}`;    
     switch (content) {
         case "Connection_Request":
             return {
@@ -30,22 +29,49 @@ const getNotificationDetails = (notification) => {
                     ? `"${post.description.substring(0, 50)}..."`
                     : `"${post.description}"`
                 : null;
-                
+
             return {
                 icon: <HiOutlineThumbUp className="h-6 w-6 text-red-500" />,
-                message:<div>
-                        <span><span className="font-bold">{senderName}</span> liked your post.</span>
-                        {postSnippet && (
-                            <blockquote className="mt-2 pl-3 border-l-4 border-gray-300 text-sm text-gray-600 italic">
-                                {postSnippet}
-                            </blockquote>
-                        )}
-                    </div>,
+                message: <div>
+                    <span><span className="font-bold">{senderName}</span> liked your post.</span>
+                    {postSnippet && (
+                        <blockquote className="mt-2 pl-3 border-l-4 border-gray-300 text-sm text-gray-600 italic">
+                            {postSnippet}
+                        </blockquote>
+                    )}
+                </div>,
             };
         case "New_Comment":
+
+            const commentSnippet = comment
+                ? comment.length > 20
+                    ? `"${comment.substring(0, 20)}..."`
+                    : `"${comment}"`
+                : null;                                
+            const postCommentSnippet = post?.description
+                ? post.description.length > 40
+                    ? `"${post.description.substring(0, 40)}..."`
+                    : `"${post.description}"`
+                : null;                
             return {
                 icon: <HiOutlineChatAlt2 className="h-6 w-6 text-gray-600" />,
-                message: <span><span className="font-bold">{senderName}</span> commented on your post.</span>,
+                message: (
+                    <div>
+                        <span>
+                            <span className="font-bold">{senderName}</span> commented on your post.
+                        </span>
+                        {commentSnippet && (
+                            <blockquote className="mt-2 pl-3 border-l-4 border-blue-400 text-sm text-gray-800 italic">
+                               comment: {commentSnippet}
+                            </blockquote>
+                        )}
+                        {postCommentSnippet && (
+                           <p className="mt-2 text-xs text-gray-500">
+                                On post: <span className="italic">{postCommentSnippet}</span>
+                           </p>
+                        )}
+                    </div>
+                ),
             };
         default:
             return {
@@ -171,13 +197,13 @@ const Notification = () => {
                 navigate(`/profile/${notification.sender.username}`);
             } else {
                 toast.error("Post details not available.");
-            }   
+            }
         } else if (notification.content === "Connection_Request" || notification.content === "Request_Accepted") {
             if (notification.sender && notification.sender.username) {
                 navigate(`/profile/${notification.sender.username}`);
             } else {
                 toast.error("User profile not available.");
-            }   
+            }
         }
     };
 

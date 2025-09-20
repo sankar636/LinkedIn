@@ -10,6 +10,7 @@ const SocketProvider = ({ children }) => {
     const [onlineUsers, setOnlineUsers] = useState([])
     const { userData } = useContext(UserDataContext);
     const [notifications, setNotifications] = useState([]);
+    const [ lastMessage, setLastMessage ] = useState(null);
     useEffect(() => {
         if (userData?._id) {
             const token = localStorage.getItem("token");
@@ -26,7 +27,6 @@ const SocketProvider = ({ children }) => {
             setSocket(newSocket);
 
             newSocket.on("getOnlineUsers", (users) => {
-                // console.log("Online users:", users);
                 setOnlineUsers(users)
             });
 
@@ -34,10 +34,6 @@ const SocketProvider = ({ children }) => {
                 console.log(`Server connected on ID ${newSocket.id}`);
             })
             newSocket.on('connection-request', (notificationData) => {
-                console.log("SocketProvider received connection-request:", notificationData);
-                // setNotifications((prevNotifications) => [...prevNotifications, notificationData]);
-                // console.log(notificationData);
-
                 toast.success(
                     `${notificationData.sender?.firstname || 'Someone'} sent you a connection request!`,
                     {
@@ -46,9 +42,6 @@ const SocketProvider = ({ children }) => {
                 );
             });
             newSocket.on('Request_Accepted', (notificationData) => {
-                console.log("SocketProvider received Request_Accepted:", notificationData);
-                // setNotifications((prevNotifications) => [...prevNotifications, notificationData]);
-                // console.log(notificationData);
                 toast.success(
                     `${notificationData.sender?.firstname || 'Someone'} accepted your connection request!`,
                     {
@@ -57,8 +50,6 @@ const SocketProvider = ({ children }) => {
                 );
             });
             newSocket.on('Post_Like', (notificationData) => {
-                console.log("SocketProvider received Post_Like:", notificationData);
-                // console.log(notificationData);
                 toast.success(
                     `${notificationData.sender?.firstname || 'Someone'} Liked Your Post!`,
                     {
@@ -66,6 +57,25 @@ const SocketProvider = ({ children }) => {
                     }
                 );
             });
+            newSocket.on('New_Comment', (notificationData) => {
+                toast.success(
+                    `${notificationData.sender?.firstname || 'Someone'} Commented on Your Post!`,
+                    {
+                        duration: 2000
+                    }
+                );
+            }
+            );
+            newSocket.on("newChat",(newChat) => {
+                setLastMessage(newChat);
+                toast.success(
+                    `You received a new message from ${newChat.sender?.firstname || 'Someone'}!`,
+                    {
+                        duration: 1000
+                    }
+                );
+            });
+
             newSocket.on('error', (error) => {
                 console.error('Socket error:', error);
             });
@@ -82,15 +92,14 @@ const SocketProvider = ({ children }) => {
 
     }, [userData?._id])
 
-    const value = useMemo(() => ({
+    const contextValue = useMemo(() => ({
         socket,
         onlineUsers,
-        // notifications,
-        // setNotifications
-    }), [socket, onlineUsers]);
+        lastMessage
+    }), [socket, onlineUsers, lastMessage]);
 
     return (
-        <SocketContext.Provider value={{ value }}>
+        <SocketContext.Provider value={contextValue}>
             {children}
         </SocketContext.Provider>
     );

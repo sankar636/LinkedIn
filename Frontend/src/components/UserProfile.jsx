@@ -6,6 +6,7 @@ import EmptyProfile from '/EmptyProfile.svg';
 import { useUser } from '../context/UserContext.jsx';
 import { useConnections } from '../context/ConnectionContext.jsx';
 import { SocketContext } from '../context/SocketContext';
+import { Link } from 'react-router-dom';
 
 
 const UserProfile = ({ username }) => {
@@ -101,7 +102,10 @@ const UserProfile = ({ username }) => {
     const renderConnectionButton = () => {
         if (isOwnProfile) return null;
         if (isConnected) {
-            return <button disabled className="py-2 px-4 border rounded-full text-blue-600 font-semibold hover:bg-blue-50 flex items-center justify-center gap-2 cursor-pointer">Message</button>;
+            return <Link to="/chatPage" 
+            state = {{userId: profileData._id, name: profileData.firstname, connections: connections}}
+            className="py-2 px-4 border rounded-full text-blue-600 font-semibold hover:bg-blue-50 flex items-center justify-center gap-2 cursor-pointer"           
+            >Message</Link>;
         }
         // If current user is recipient and ignored the request
         if (isIgnored) {
@@ -138,7 +142,7 @@ const UserProfile = ({ username }) => {
                 </div>
                 <div className="w-[100px] h-[100px] rounded-full overflow-hidden absolute top-[100px] left-[30px] border-4 border-white shadow-md">
                     <img
-                        src={profileData.profilePic || EmptyProfile}
+                        src={profileData.profileImage || EmptyProfile}
                         alt="Profile"
                         className="w-full h-full object-cover"
                     />
