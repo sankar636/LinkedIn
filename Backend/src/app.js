@@ -57,5 +57,8 @@ app.use('/api/connections', connectionRouter)
 import notificationRouter from './routes/notification.route.js'
 app.use('/api/notifications', notificationRouter)
 
+import chatRouter from './routes/chat.route.js'
+app.use('/api/chat', chatRouter)
+
 
 export { app }
