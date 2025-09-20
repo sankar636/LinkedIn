@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 import { validationResult } from "express-validator";
+import uploadOnCloudinary from "../utils/UploadOnCloudinary.js";
 
 const getCurrentUser = AsyncHandler(async (req, res) => {
   if (!req.user) {
@@ -27,7 +28,6 @@ const updateProfile = AsyncHandler(async (req, res) => {
     throw new ApiError(401, "Unauthorized access");
   }
 
-  // Prepare update object
   const updateFields = {};
 
   if (skills !== undefined) updateFields.skills = Array.isArray(skills) ? skills : [];
@@ -53,19 +53,19 @@ const updateProfile = AsyncHandler(async (req, res) => {
 });
 
 const getUserAccountProfile = AsyncHandler(async (req, res) => {
-  const { username } = req.params;  
+  const { username } = req.params;
   if (!username?.trim()) {
     throw new ApiError(404, "username is not defined");
   }
 
-  const user = await User.findOne({ username }).select("-password");  
+  const user = await User.findOne({ username }).select("-password");
   if (!user) {
     throw new ApiError(404, "user not Found");
   }
 
   const posts = await Post.find({ author: user._id }).sort({ createdAt: -1 })
 
-  if(!posts){
+  if (!posts) {
     throw new ApiError(404, "Post Not found")
   }
 
@@ -75,24 +75,21 @@ const getUserAccountProfile = AsyncHandler(async (req, res) => {
 
 })
 
-const getProfileById = AsyncHandler(async(req, res) => {
+const getProfileById = AsyncHandler(async (req, res) => {
   const { id } = req.params;
-  // console.log(id);
-  
-  if(!id){
-    throw new ApiError(400,"User is not valid");
+
+  if (!id) {
+    throw new ApiError(400, "User is not valid");
   }
-  const user = await User.findById({ _id:id }).select('-password');
-  if(!user){
-    throw new ApiError(400,"User not found")
+  const user = await User.findById({ _id: id }).select('-password');
+  if (!user) {
+    throw new ApiError(400, "User not found")
   }
-  const posts = await Post.find({ author: user._id}).sort({ createdAt: -1 })
-  if(!posts){
-    throw new ApiError(400,"Posts not found")
+  const posts = await Post.find({ author: user._id }).sort({ createdAt: -1 })
+  if (!posts) {
+    throw new ApiError(400, "Posts not found")
   }
-  // console.log(user);
-  // console.log(posts);
-  
+
   return res.status(200).json(
     new ApiResponse(200, "user fetched successfully", { user, posts })
   );
@@ -106,7 +103,6 @@ const followUser = AsyncHandler(async (req, res) => {
   }
   const userId = req.user._id;
   const { id } = req.params;
-  console.log(id);
 
   const user = await User.findById(userId).select("-password");
   const followingUser = await User.findById(id).select("-password");
@@ -130,8 +126,10 @@ const followUser = AsyncHandler(async (req, res) => {
   }
   return res
     .status(200)
-    .json(new ApiResponse(200, "User followed successfully", {following: user.following, 
-      followers: user.followers }));
+    .json(new ApiResponse(200, "User followed successfully", {
+      following: user.following,
+      followers: user.followers
+    }));
 })
 
 const getFollowUser = AsyncHandler(async (req, res) => {
@@ -149,11 +147,73 @@ const getFollowUser = AsyncHandler(async (req, res) => {
     new ApiResponse(200, "user fatched successfully", { followers, following })
   );
 })
+
+const updateProfileImage = AsyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const profileImageLocalPath = req.file?.path  
+  if (!profileImageLocalPath) {
+    throw new ApiError(400, "No profileImage was found")
+  }
+
+  const profileImage = await uploadOnCloudinary(profileImageLocalPath)
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        profileImage: profileImage
+      }
+    },
+    {
+      new: true
+    }
+  ).select('-password')
+
+  if (!user) {
+    throw new ApiError(400, "No user found")
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, "profileImage updated successfully", { user })
+  );
+})
+
+const updateCoverImage = AsyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const coverImageLocalPath = req.file?.path  
+  if (!coverImageLocalPath) {
+    throw new ApiError(400, "No Cover Image was found")
+  }
+
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+  
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        coverImage: coverImage
+      }
+    },
+    {
+      new: true
+    }
+  ).select('-password')
+
+  if (!user) {
+    throw new ApiError(400, "No user found")
+  }
+  return res.status(200).json(
+    new ApiResponse(200, "coverImage updated successfully", { user })
+  );
+})
+
 export {
   getCurrentUser,
   updateProfile,
   getUserAccountProfile,
   followUser,
   getFollowUser,
-  getProfileById
+  getProfileById,
+  updateProfileImage,
+  updateCoverImage
 }

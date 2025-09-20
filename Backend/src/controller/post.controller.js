@@ -6,9 +6,9 @@ import Post from "../models/post.model.js";
 import { validationResult } from "express-validator";
 import { sendMessageToUser, getReceiverSocketId } from "../socket.js";
 import Notification from "../models/notification.model.js";
+import uploadOnCloudinary from "../utils/UploadOnCloudinary.js";
 
 
-// Create Post
 const createPost = AsyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -16,11 +16,21 @@ const createPost = AsyncHandler(async (req, res) => {
     }
 
     const { description, hashtags } = req.body;
-    const image = req.file?.path; // Assuming you're using multer for file uploads
+    const imageLocalPath = req.file?.path; 
+    let image;
+    if (!imageLocalPath) {
+        console.log("No Image was found");
+    } else {
+        image = await uploadOnCloudinary(imageLocalPath)
+        if (!image) {
+            console.log("No image uploaded on cloudinary")
+        }
+    }
 
     if (!description?.trim()) {
         throw new ApiError(400, "Post description is required");
     }
+
 
     const post = await Post.create({
         description,
@@ -43,7 +53,6 @@ const createPost = AsyncHandler(async (req, res) => {
     );
 });
 
-// Update Post
 const updatePost = AsyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -80,7 +89,6 @@ const updatePost = AsyncHandler(async (req, res) => {
     );
 });
 
-// Delete Post
 const deletePost = AsyncHandler(async (req, res) => {
     const { postId } = req.params;
 
@@ -108,7 +116,6 @@ const getAllPosts = AsyncHandler(async (req, res) => {
         .json(new ApiResponse(200, "All posts fetched successfully", { posts }));
 });
 
-// Get posts of a specific user (Profile page)
 const getUserPosts = AsyncHandler(async (req, res) => {
     const userId = req.params.userId;
 
@@ -132,15 +139,15 @@ const likePosts = AsyncHandler(async (req, res) => {
     const isAlreadyLiked = post.likes.includes(userId);
 
     const updateOperation = isAlreadyLiked
-        ? { $pull: { likes: userId } } // Unlike
-        : { $addToSet: { likes: userId } }; // Like
+        ? { $pull: { likes: userId } } 
+        : { $addToSet: { likes: userId } }; 
 
     const updatedPost = await Post.findByIdAndUpdate(
         id,
         updateOperation,
         { new: true }
-    ).populate("author", "firstname lastname username headLine profileImage"); // Re-populate the author
-    
+    ).populate("author", "firstname lastname username headLine profileImage");
+
     if (!updatedPost) {
         throw new ApiError(500, "Failed to update post like status");
     }
@@ -154,7 +161,7 @@ const likePosts = AsyncHandler(async (req, res) => {
             receiver: recipientId,
             sender: userId,
             content: "Post_Like",
-            post: id, 
+            post: id,
             isNew: !isRecipientOnline,
         });
 
@@ -165,12 +172,11 @@ const likePosts = AsyncHandler(async (req, res) => {
         if (isRecipientOnline) {
             const populatedNotification = await Notification.findById(notification._id)
                 .populate("sender", "firstname lastname username")
-                .populate("post", "description"); 
-                console.log(populatedNotification);
-                            
+                .populate("post", "description");
+
             sendMessageToUser(recipientId, {
                 event: 'Post_Like',
-                data: populatedNotification 
+                data: populatedNotification
             });
         }
     }
