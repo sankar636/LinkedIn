@@ -59,7 +59,7 @@ const CommentSection = ({ post, userData }) => {
     <div className="px-4 py-3">
       <div className="flex items-center gap-2 mb-3">
         <img
-          src={userData?.profilePic || EmptyProfile}
+          src={userData?.profileImage || EmptyProfile}
           alt="Me"
           className="w-8 h-8 rounded-full object-cover"
         />
@@ -91,7 +91,7 @@ const CommentSection = ({ post, userData }) => {
             >
               <div className="flex items-start gap-2 flex-1">
                 <img
-                  src={comment.user?.profilePic || EmptyProfile}
+                  src={comment.user?.profileImage || EmptyProfile}
                   alt={comment.user?.firstname}
                   className="w-6 h-6 rounded-full object-cover mt-1"
                 />

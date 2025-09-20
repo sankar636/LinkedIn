@@ -28,7 +28,7 @@ const Home = () => {
         </div>
         <div className='w-[70px] h-[70px] rounded-full overflow-hidden items-center justify-center absolute top-[55px] left-[38px]'>
           <img
-            src={userData?.profilePic || `${EmptyProfile}`}
+            src={userData?.profileImage || `${EmptyProfile}`}
             alt="Profile"
             className="h-full"
           />
@@ -52,7 +52,7 @@ const Home = () => {
         <div className="w-full h-[120px] bg-white shadow-lg rounded-lg flex items-center justify-center px-2 gap-2">
           <div className="w-[70px] h-[70px] rounded-full overflow-hidden flex items-center justify-center">
             <img
-              src={userData?.profilePic || `${EmptyProfile}`}
+              src={userData?.profileImage || `${EmptyProfile}`}
               alt="Profile"
               className="h-full"
             />

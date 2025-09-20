@@ -62,13 +62,13 @@ const PostItem = React.memo(({
     const authorUsername = author.username || '';
     const authorFirstname = author.firstname || 'Unknown';
     const authorLastname = author.lastname || 'User';
-    const authorProfilePic = author.profilePic || EmptyProfile;
+    const authorProfilePic = author.profileImage || EmptyProfile;
     
     const isFollowing = useMemo(() =>
         userData.following?.includes(authorId),
         [userData.following, authorId]
     );
-    
+        
     const isOwnPost = useMemo(() =>
         userData?._id === authorId,
         [userData?._id, authorId]
@@ -169,7 +169,7 @@ const PostItem = React.memo(({
                     <img
                         src={post.image}
                         alt="Post"
-                        className="w-full rounded-lg object-cover"
+                        className="w-fit h-[250px] rounded-lg object-fit"
                         loading="lazy"
                     />
                 </div>
