@@ -4,6 +4,8 @@ import { AsyncHandler } from "../utils/AsyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { validationResult } from "express-validator";
+import { sendMessageToUser, getReceiverSocketId } from "../socket.js";
+import Notification from "../models/notification.model.js";
 
 
 export const addComment = AsyncHandler(async (req, res) => {
@@ -21,17 +23,13 @@ export const addComment = AsyncHandler(async (req, res) => {
 
   const post = await Post.findById(postId);
   if (!post) throw new ApiError(404, "Post not found");
-  console.log(post.author);
-  console.log(userId);
-  console.log(post.author == userId);
 
-  const comment = await Comment.create({ post: postId, user: userId, content }); 
+  const comment = await Comment.create({ post: postId, user: userId, content });
 
   if (!comment) throw new ApiError(404, "comment not created");
 
   post.comments.push(comment._id);
 
-  // OPTIONAL: maintain a counter on Post
   if (post.commentCount !== undefined) {
     post.commentCount += 1;
     await post.save();
@@ -43,6 +41,38 @@ export const addComment = AsyncHandler(async (req, res) => {
 
   if (!populated) throw new ApiError(404, "comment not populated");
 
+  const recipientId = post.author
+  const recipientSocketId = getReceiverSocketId(recipientId);
+  const isRecipientOnline = !!recipientSocketId;
+
+  const notification = await Notification.create({
+    receiver: recipientId,
+    sender: userId,
+    content: "New_Comment",
+    post: postId,
+    comment: populated.content,
+    isNew: !isRecipientOnline,
+  })
+  if (!notification) {
+    throw new ApiError(500, "Notification could not be created");
+  }
+
+  if (isRecipientOnline) {
+    const populatedNotification = await Notification.findById(notification._id)
+      .populate("sender", "firstname lastname username")
+      .populate({
+        path: "post",
+        select: "description comments",
+        populate: {
+          path: "comments",
+          select: "content"
+        }
+      });
+    sendMessageToUser(recipientId, {
+      event: 'New_Comment',
+      data: populatedNotification
+    });
+  }
   return res
     .status(201)
     .json(new ApiResponse(201, "Comment added successfully", { comment: populated }));
@@ -85,7 +115,7 @@ export const getComments = AsyncHandler(async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("user", "firstname lastname profilePic")
+      .populate("user", "firstname lastname profileImage")
       .lean(),
     Comment.countDocuments({ post: postId }),
   ]);

@@ -1,24 +1,29 @@
 import mongoose from "mongoose";
 import Notification from "../models/notification.model.js";
-import ApiError  from "../utils/ApiError.js"
+import ApiError from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 
 const getNotifications = AsyncHandler(async (req, res) => {
     const userId = req.user._id;
-    
+
     const notifications = await Notification.find({ receiver: userId })
         .populate("sender", "firstname lastname profilePic headLine username")
-        .populate("post", "description")
-        .sort({ createdAt: -1 }); 
-    if(!notifications){
+        .populate({
+            path: "post",
+            select: "description comments",
+            populate: {
+                path: "comments",
+                select: "content"
+            }
+        })
+        .sort({ createdAt: -1 });
+    if (!notifications) {
         throw new ApiError(400, "Error wiile getting notification")
     }
-    // console.log("noti",notifications);
-    
     return res
         .status(200)
-        .json(new ApiResponse(200,"Notifications fetched successfully", notifications));
+        .json(new ApiResponse(200, "Notifications fetched successfully", notifications));
 });
 
 const markAllNotificationsAsRead = AsyncHandler(async (req, res) => {
@@ -31,24 +36,24 @@ const markAllNotificationsAsRead = AsyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(new ApiResponse(200,"All notifications marked as read", {}));
+        .json(new ApiResponse(200, "All notifications marked as read", {}));
 });
 
-const markNotificationRead = AsyncHandler(async (req,res) => {
+const markNotificationRead = AsyncHandler(async (req, res) => {
     const userId = req.user._id
-    if(!userId){
+    if (!userId) {
         throw new ApiError(500, "User not found ")
     }
     const { id } = req.params
     await Notification.findByIdAndUpdate(
-         id ,
+        id,
         { $set: { read: true } }
     );
 
-    return res.status(200).json(new ApiResponse(200,"Notification marked as read",{}))
+    return res.status(200).json(new ApiResponse(200, "Notification marked as read", {}))
 })
 
-const checkAndClearNotifications = AsyncHandler(async (req,res) => {
+const checkAndClearNotifications = AsyncHandler(async (req, res) => {
 
     const newNotifications = await Notification.find({
         receiver: req.user._id,
@@ -72,8 +77,8 @@ const checkAndClearNotifications = AsyncHandler(async (req,res) => {
         { $set: { isNew: false } }
     );
     return res
-    .status(200)
-    .json(new ApiResponse(200, "New notification summary fetched and cleared.", summary));
+        .status(200)
+        .json(new ApiResponse(200, "New notification summary fetched and cleared.", summary));
 })
 
 export { getNotifications, markAllNotificationsAsRead, markNotificationRead, checkAndClearNotifications };
