@@ -80,7 +80,7 @@ const ChatWindow = ({ recipientUser }) => {
         <div className='flex flex-col h-full bg-gray-200'>
             <div className="h-16 bg-white border-b-2 border-gray-300 flex items-center px-4 flex-shrink-0 ">
                 <img 
-                    src={recipientUser.profileImage || EmptyProfile} 
+                    src={recipientUser?.profileImage || EmptyProfile} 
                     alt={recipientUser.name} 
                     className="w-10 h-10 rounded-full mr-4"
                 />

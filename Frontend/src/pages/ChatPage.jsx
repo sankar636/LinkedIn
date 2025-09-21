@@ -1,21 +1,22 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { IoMdMenu } from "react-icons/io";
-import { FaUserPlus } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useUser } from '../context/UserContext.jsx';
-import { SocketContext } from '../context/SocketContext.jsx';
+import { IoMdMenu } from "react-icons/io";
 import Navbar from '../components/Navbar.jsx';
 import { useConnections } from '../context/ConnectionContext';
-import EmptyState from '../components/EmptyState';
-import EmptyProfile from '/EmptyProfile.svg';
 import ChatWindow from '../components/chatWindow.jsx';
-import ChatSideBar from '../components/chatSideBar.jsx';
+import ChatSideBar from '../components/chatSideBar.jsx'; // 
+
+// Overlay component for mobile view
+const Overlay = ({ onClick }) => (
+    <div 
+        onClick={onClick} 
+        className="fixed h-screen inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+    ></div>
+);
 
 const ChatPage = () => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const { userData } = useUser();
-    const { socket, onlineUsers } = useContext(SocketContext);
     const { connections, fetchConnections, loading } = useConnections();
     const location = useLocation();
 
@@ -34,39 +35,48 @@ const ChatPage = () => {
 
     const handleUserSelect = (user) => {
         setSelectedUser(user);
-        setSidebarOpen(false);
+        setIsSidebarOpen(false); 
     };
 
     return (
-        <div className='h-[screen-20px] w-full bg-gray-100 flex flex-col mt-20'>
+        <div className="h-screen flex flex-col mt-20">
             <Navbar />
-            <div className="flex flex-1 overflow-hidden"> 
-                <div className="sm:hidden absolute top-16 left-4 z-30">
-                    <button onClick={() => setSidebarOpen(!sidebarOpen)}>
-                        <IoMdMenu className="h-6 w-6" />
-                    </button>
-                </div>
-
+            <div className="flex flex-1 overflow-y-hidden">
+                <button
+                    className="md:hidden p-4 text-2xl absolute top-15 right-2 z-10"
+                    onClick={() => setIsSidebarOpen(true)}
+                >
+                    <IoMdMenu />
+                </button>
                 <ChatSideBar
-                    sidebarOpen={sidebarOpen}
-                    setSidebarOpen={setSidebarOpen}
+                    isSidebarOpen={isSidebarOpen}
+                    setIsSidebarOpen={setIsSidebarOpen}
                     loading={loading}
                     connections={connections}
                     selectedUser={selectedUser}
                     handleUserSelect={handleUserSelect}
                 />
-                <div className="flex-1 flex flex-col">
+                
+                {/* Overlay to close sidebar on mobile */}
+                {isSidebarOpen && <Overlay onClick={() => setIsSidebarOpen(false)} />}
+
+
+                {/* Main Chat Content */}
+                <main className="flex-1 flex flex-col">
                     {selectedUser ? (
                         <ChatWindow recipientUser={selectedUser} key={selectedUser._id} />
                     ) : (
-                        <div className="flex-1 flex items-center justify-center bg-gray-200 text-gray-500">
-                            <p>Select a conversation to start chatting.</p>
+                        <div className="flex-1 flex items-center justify-center bg-gray-200 text-gray-500 p-4 text-center">
+                            {/* Hidden on mobile unless no user is selected */}
+                            <p className={`${isSidebarOpen ? 'hidden' : 'block'} md:block`}>
+                                Select a conversation to start chatting.
+                            </p>
                         </div>
                     )}
-                </div>
+                </main>
             </div>
         </div>
     );
-}
+};
 
 export default ChatPage;
