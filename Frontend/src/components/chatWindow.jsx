@@ -4,6 +4,7 @@ import { useUser } from '../context/UserContext.jsx';
 import { SocketContext } from '../context/SocketContext.jsx';
 import { AuthDataContext } from '../context/AuthContext.jsx';
 import { FiSend } from "react-icons/fi";
+import EmptyProfile from '/EmptyProfile.svg';
 
 const ChatWindow = ({ recipientUser }) => {
     const [messages, setMessages] = useState([]);
