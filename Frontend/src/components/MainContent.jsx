@@ -10,23 +10,19 @@ import FollowView from './FollowView';
 // import SchoolsView from './SchoolsView';
 
 const MainContent = ({ activeTab }) => {
-    const contentViews = {
-        connections: <ConnectionView />,
-        followingfollowers: <FollowView />,
-        // groups: <GroupsView />,
-        // events: <EventsView />,
-        // newsletters: <NewslettersView />,
-        // notifications: <NotificationsView />,
-        // hashtags: <HashtagsView />,
-        // companies: <CompaniesView />,
-        // schools: <SchoolsView />,
-    };
+  const contentViews = {
+    connections: <ConnectionView />,
+    followingfollowers: <FollowView />,
+    // groups: <GroupsView />,
+    // events: <EventsView />,
+    // newsletters: <NewslettersView />,
+    // notifications: <NotificationsView />,
+    // hashtags: <HashtagsView />,
+    // companies: <CompaniesView />,
+    // schools: <SchoolsView />,
+  };
 
-    return (
-        <main className="w-full lg:flex-1">
-            {contentViews[activeTab]}
-        </main>
-    );
+  return <main className="w-full lg:flex-1">{contentViews[activeTab]}</main>;
 };
 
 export default MainContent;

@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import axios from "axios";
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 
 export const AuthDataContext = createContext();
 export const useAuth = () => {
@@ -11,19 +11,18 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }) => {
-    // const serverUrl = 'http://localhost:4000/api'
-    const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
+  // const serverUrl = 'http://localhost:4000/api';
+  const serverUrl = 'https://linkedin-q5gk.onrender.com/api'
 
-    let value = {
-        serverUrl
-    }
+  let value = {
+    serverUrl,
+  };
 
-    return (
-        <AuthDataContext.Provider value={value}>
-            {children}
-        </AuthDataContext.Provider>
-    );
+  return (
+    <AuthDataContext.Provider value={value}>
+      {children}
+    </AuthDataContext.Provider>
+  );
 };
 
 export default AuthProvider;
-
