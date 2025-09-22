@@ -48,8 +48,6 @@ const connectUser = AsyncHandler(async (req, res) => {
     const populatedConnection = await Connection.findById(connection._id)
         .populate("requester", "username firstname lastname profileImage")
         .populate("recipient", "username firstname lastname profileImage");
-
-    // Check if the recipient is currently online
     const recipientSocketId = getReceiverSocketId(recipientId);
     const isRecipientOnline = !!recipientSocketId;
 
@@ -61,9 +59,7 @@ const connectUser = AsyncHandler(async (req, res) => {
     })
     if (!notification) {
         throw new ApiError(500, "Notification could not be created");
-    }
-    // console.log("Notification", notification);
-    
+    }    
 
     if (isRecipientOnline) {
         const populatedNotification = await Notification.findById(notification._id)
@@ -80,14 +76,14 @@ const connectUser = AsyncHandler(async (req, res) => {
 });
 
 const acceptConnection = AsyncHandler(async (req, res) => {
-    const userId = req.user._id; // The one accepting
-    const { id: requestedUserId } = req.params; // The one who sent the request
+    const userId = req.user._id; 
+    const { id: requestedUserId } = req.params; 
       
     const connection = await Connection.findOneAndUpdate(
         {
             requester: requestedUserId,
             recipient: userId,
-            status: { $in: ["pending", "ignored"] } // Can accept a previously ignored request
+            status: { $in: ["pending", "ignored"] } 
         },
         { $set: { status: "accepted" } },
         { new: true }
@@ -112,7 +108,6 @@ const acceptConnection = AsyncHandler(async (req, res) => {
     if (isRecipientOnline) {
         const populatedNotification = await Notification.findById(notification._id)
             .populate("sender", "firstname lastname username");
-        console.log(populatedNotification);
         sendMessageToUser(requestedUserId, {
             event: 'Request_Accepted', 
             data: populatedNotification
@@ -122,13 +117,9 @@ const acceptConnection = AsyncHandler(async (req, res) => {
         new ApiResponse(200, "Connection accepted successfully", connection)
     );
 });
-
-// Ignore a connection request
 const ignoreConnection = AsyncHandler(async (req, res) => {
-    const userId = req.user._id; // The one ignoring
-    const { id: ignoreUserId } = req.params; // The one who sent the request
-    console.log(userId);
-    console.log(ignoreUserId);
+    const userId = req.user._id; 
+    const { id: ignoreUserId } = req.params;
     const connection = await Connection.findOneAndUpdate(
         {
             requester: ignoreUserId,
@@ -148,17 +139,14 @@ const ignoreConnection = AsyncHandler(async (req, res) => {
     );
 });
 
-// Get all connections and requests for the logged-in user
 const getConnections = AsyncHandler(async (req, res) => {
     const userId = req.user._id;
 
-    // Find any connection document where the user is either the requester or recipient
     const connections = await Connection.find({
         $or: [{ requester: userId }, { recipient: userId }]
     })
         .populate("requester", "username firstname lastname profileImage")
         .populate("recipient", "username firstname lastname profileImage");
-    // console.log(connections);
 
     return res.status(200).json(
         new ApiResponse(200, "All connections fetched successfully", connections)
@@ -168,6 +156,6 @@ const getConnections = AsyncHandler(async (req, res) => {
 export {
     connectUser,
     acceptConnection,
-    getConnections, // Make sure your route points to this
+    getConnections, 
     ignoreConnection
 };

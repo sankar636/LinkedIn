@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getNotifications, markAllNotificationsAsRead, markNotificationRead, checkAndClearNotifications } from '../controller/notification.controller.js'
-import  verifyJWT  from '../middleware/auth.middleware.js'; // Make sure to import your auth middleware
+import  verifyJWT  from '../middleware/auth.middleware.js'; 
 
 const router = Router();
 

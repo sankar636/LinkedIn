@@ -6,8 +6,8 @@ import { validationResult } from "express-validator";
 
 const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // true in production, false in dev
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 'none' for cross-site, 'lax' for same-site
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
 };
 
 const registerUser = AsyncHandler(async (req, res) => {
@@ -58,7 +58,6 @@ const loginUser = AsyncHandler(async (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    console.log(req.body);
     
     const { email, username, password } = req.body
 
